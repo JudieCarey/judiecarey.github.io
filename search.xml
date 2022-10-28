@@ -1,6 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Cache</title>
+    <url>/Cache.html</url>
+    <content><![CDATA[<p><strong><em>Brief Intro</em></strong> ：<em>Telling about differences among several cache methods</em></p>
+<ul>
+<li>强缓存</li>
+<li>协商缓存</li>
+</ul>
+<span id="more"></span>
+
+<p><strong>强缓存和协商缓存都称做 HTTP 缓存，指的是在 HTTP 请求中，识别 HTTP 报文达到请求缓存的效果</strong></p>
+<h1 id="缓存位置"><a href="#缓存位置" class="headerlink" title="缓存位置"></a>缓存位置</h1><ul>
+<li>Service Worker：运行在浏览器背后的独立线程，它可以自由控制缓存哪些文件、如何匹配缓存、如何读取缓存，并且缓存是持续性的。因为它涉及到了请求拦截，所以必须为 HTTPS。</li>
+<li>Memory Cache：基于内存的缓存，读取高效速度快，但是一旦关闭网页，内存就释放了。</li>
+<li>Disk Cache：基于磁盘的缓存，容量大，读取慢</li>
+<li> Push Cache：推送缓存，http2 中的内容，缓存在会话 session 中的</li>
+</ul>
+<h1 id="强缓存"><a href="#强缓存" class="headerlink" title="强缓存"></a>强缓存</h1><p>访问 URL 的时候，不会发起服务器请求，直接读取缓存资源，但会返回 200 状态的结果。使用 http 头中的 <code>expires</code>（http1.0）和 <code>cache control</code>（http1.1）来控制。</p>
+<h2 id="Expires"><a href="#Expires" class="headerlink" title="Expires"></a>Expires</h2><p>是一个时间戳，用来缓存请求结果到期时间，在时间内直接使用缓存，过期了重新请求。</p>
+<h2 id="Cache-Control"><a href="#Cache-Control" class="headerlink" title="Cache-Control"></a>Cache-Control</h2><p>缓存优先级高于 expires，常用值为：</p>
+<ul>
+<li>private: 仅浏览器可以缓存</li>
+<li> public: 浏览器和代理服务器都可以缓存</li>
+<li> max-age=xxx：过期时间单位 (秒)</li>
+<li>no-cache：不进行强缓存</li>
+<li> no-store：不强缓存，也不协商缓存</li>
+</ul>
+<h1 id="协商缓存"><a href="#协商缓存" class="headerlink" title="协商缓存"></a>协商缓存</h1><h2 id="条件"><a href="#条件" class="headerlink" title="条件"></a>条件</h2><ul>
+<li>没有 cache-control 和 expires</li>
+<li>cache-control 和 expires 过期</li>
+<li> cache-control 设置为 no-cache</li>
+</ul>
+<p>满足以上条件时，浏览器进入协商缓存，如果命中则返回 304 状态码，如果没有命中，则重新请求资源，返回 200 状态码</p>
+<h2 id="last-modified-x2F-if-modified-since"><a href="#last-modified-x2F-if-modified-since" class="headerlink" title="last-modified/if-modified-since"></a>last-modified/if-modified-since</h2><ul>
+<li>第一次请求的时候会带上 <code>last-modified</code>，返回资源在服务端最后被修改的时间</li>
+<li>再次请求的时候，请求头会带上 <code>if-modified-since</code>，根据资源的最后修改时间判断是否命中缓存<ul>
+<li>命中后返回 304，并不返回资源内容</li>
+<li>未命中则重新请求</li>
+</ul>
+</li>
+</ul>
+<h2 id="etag-x2F-if-none-match"><a href="#etag-x2F-if-none-match" class="headerlink" title="etag/if-none-match"></a>etag/if-none-match</h2><ul>
+<li><code>etag</code> 返回的是当前资源文件的唯一标识（服务器生成）</li>
+<li><code>if-no-match</code> 是客户端发起该请求的时候，携带上次请求返回的唯一标识 etag 值<ul>
+<li><code>if-no-match</code> 字段值与资源在服务器的 <code>etag</code> 值作对比，一致则返回 304</li>
+<li> 不一致则重新返回资源文件，状态码 200</li>
+</ul>
+</li>
+</ul>
+<h1 id="用处"><a href="#用处" class="headerlink" title="用处"></a>用处</h1><ul>
+<li>HTML：协商缓存</li>
+<li> CSS、JS、图片：强缓存，文件名带上 hash</li>
+</ul>
+<h1 id="优先级"><a href="#优先级" class="headerlink" title="优先级"></a>优先级</h1><ul>
+<li>强缓存高于协商缓存</li>
+<li>协商缓存的 Etag 高于 Last-Modified</li>
+</ul>
+<p><img src="/assets/cache.png" alt="cache"></p>
+]]></content>
+      <categories>
+        <category>Computer Science</category>
+        <category>Http Cache</category>
+      </categories>
+      <tags>
+        <tag>cache</tag>
+        <tag>http</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Fiber-Architecture</title>
     <url>/Fiber-Architecture.html</url>
     <content><![CDATA[<p><em><strong>Brief Intro</strong></em>：<em>New Architecture to React solve some remaining problems, it’s working process and every part of stage has completely change in fiber</em></p>

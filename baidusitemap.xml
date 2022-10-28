@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://judiecarey.github.io/Cache.html</loc>
+    <lastmod>2022-10-28</lastmod>
+  </url>
+  <url>
     <loc>https://judiecarey.github.io/TS.html</loc>
     <lastmod>2022-10-27</lastmod>
   </url>
@@ -9,11 +13,11 @@
     <lastmod>2022-10-27</lastmod>
   </url>
   <url>
-    <loc>https://judiecarey.github.io/Hooks.html</loc>
+    <loc>https://judiecarey.github.io/Git-Relate.html</loc>
     <lastmod>2022-10-27</lastmod>
   </url>
   <url>
-    <loc>https://judiecarey.github.io/Git-Relate.html</loc>
+    <loc>https://judiecarey.github.io/Hooks.html</loc>
     <lastmod>2022-10-27</lastmod>
   </url>
   <url>
@@ -25,11 +29,11 @@
     <lastmod>2022-10-27</lastmod>
   </url>
   <url>
-    <loc>https://judiecarey.github.io/Fiber-Architecture.html</loc>
+    <loc>https://judiecarey.github.io/EventLoop.html</loc>
     <lastmod>2022-10-27</lastmod>
   </url>
   <url>
-    <loc>https://judiecarey.github.io/EventLoop.html</loc>
+    <loc>https://judiecarey.github.io/Fiber-Architecture.html</loc>
     <lastmod>2022-10-27</lastmod>
   </url>
   <url>
