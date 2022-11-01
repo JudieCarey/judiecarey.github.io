@@ -20,10 +20,10 @@ https://judiecarey.github.io/tags/concept/
 https://judiecarey.github.io/tags/architecture/
 https://judiecarey.github.io/tags/cache/
 https://judiecarey.github.io/tags/http/
-https://judiecarey.github.io/tags/algorithm/
-https://judiecarey.github.io/tags/diff/
 https://judiecarey.github.io/tags/event/
 https://judiecarey.github.io/tags/loop/
+https://judiecarey.github.io/tags/algorithm/
+https://judiecarey.github.io/tags/diff/
 https://judiecarey.github.io/tags/fiber/
 https://judiecarey.github.io/tags/gc/
 https://judiecarey.github.io/tags/git/
@@ -39,7 +39,7 @@ https://judiecarey.github.io/categories/Computer-Science/Http-Cache/
 https://judiecarey.github.io/categories/Git/
 https://judiecarey.github.io/categories/React/Hooks/
 https://judiecarey.github.io/categories/React/Diff/
-https://judiecarey.github.io/categories/React/Fiber/Fiber-Concept/
-https://judiecarey.github.io/categories/React/Fiber/Fiber-Architecture/
 https://judiecarey.github.io/categories/React/React-Life-Cycle/
 https://judiecarey.github.io/categories/JS/TS/
+https://judiecarey.github.io/categories/React/Fiber/Fiber-Architecture/
+https://judiecarey.github.io/categories/React/Fiber/Fiber-Concept/
