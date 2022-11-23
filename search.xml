@@ -28,7 +28,7 @@
 <h1 id="Prisma"><a href="#Prisma" class="headerlink" title="Prisma"></a>Prisma</h1><p><a href="https://prisma.yoga/">官网</a><br><a href="https://github.com/prisma/prisma">Github</a></p>
 <h2 id="简介-1"><a href="#简介-1" class="headerlink" title="简介"></a>简介</h2><p>Prisma 是一个开源的数据库工具链项目，帮助开发人员更快地构建应用程序并减少错误，支持 PostgreSQL、MySQL、MongoDB、SQL Server 和 SQLite。</p>
 <h2 id="优点-1"><a href="#优点-1" class="headerlink" title="优点"></a>优点</h2><ul>
-<li>提供干净和类型安全的 API 体积哦啊数据库查询，同时返回普通的 JS 对象，更容易进行数据库查询</li>
+<li>提供干净和类型安全的 API，小体积数据库查询，同时返回普通的 JS 对象，更容易进行数据库查询</li>
 <li>自带 CRUD 封装、提供 VSCode 扩展插件、语法高亮、智能自动补全</li>
 <li>文档详细全面，当前呼声较高，</li>
 <li>支持多个数据库。在 SQL 和 NoSQL 数据库之间移动时，这对开发人员来说是一个巨大的优势，因为只需要更改 Schema 文件。所有其他操作 / 查询保持不变</li>
