@@ -1,6 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Npm</title>
+    <url>/Npm.html</url>
+    <content><![CDATA[<p><strong><em>Brief Intro</em></strong> ：<em>Summarize the process while starting a frontend project and what npm do during after ‘npm start’ and other knowledges related to npm</em></p>
+<span id="more"></span>
+
+<h1 id="Install-Packages-Flow"><a href="#Install-Packages-Flow" class="headerlink" title="Install Packages Flow"></a>Install Packages Flow</h1><div id="flowchart-0" class="flow-chart"></div>
+
+<h1 id="Lock-json-file"><a href="#Lock-json-file" class="headerlink" title="Lock.json file"></a>Lock.json file</h1><p>解决的主要是 npm install 不确定性问题</p>
+<ul>
+<li>存在 lock 文件的时候，npm install 生成的 node_modules 目录结构一定完全相同</li>
+<li>不同在 lock 文件的时候，重新执行一遍 npm install 流程</li>
+</ul>
+<h2 id="dependencies"><a href="#dependencies" class="headerlink" title="dependencies"></a>dependencies</h2><ul>
+<li><code>version</code>：包版本，安装在 node_modules 中的版本</li>
+<li><code>resolved</code>：包具体安装来源</li>
+<li><code>integrity</code>：包 hash 值，验证已安装的包是否被改动过，是否已失效源</li>
+<li><code>requires</code>：对应子依赖的依赖，与子依赖的 package.json 中的 dependencies 依赖项相同</li>
+<li><code>dependencies</code>：结构和外部 dependencies 结构一样，存储安装在子依赖 node_modules 中的依赖包。并不是所有子依赖都有 dependencies 属性，只有子依赖的依赖和当前已安装在根目录 node_modules 中的依赖冲突后才会有<script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/flowchart/1.6.5/flowchart.min.js"></script><textarea id="flowchart-0-code" style="display: none">st=&gt;start: npm install
+e=&gt;end: 生成lock文件
+op1=&gt;operation: 检查config
+op2=&gt;operation: 远程获取包信息
+op3=&gt;operation: 构建依赖树
+op4=&gt;operation: 下载包资源
+op5=&gt;operation: 校验完整性
+op6=&gt;operation: 解压到node_modules
+sub1=&gt;subroutine: 扁平化
+sub2=&gt;subroutine: 添加到缓存
+cond1=&gt;condition: 是否有lock文件
+cond2=&gt;condition: 是否和package.json声明版本不一致
+cond3=&gt;condition: 检查是否有缓存
+
+
+st-&gt;op1-&gt;cond1
+cond1(yes,right)-&gt;cond2
+cond1(no)-&gt;op2
+cond2(yes)-&gt;op2
+cond2(no)-&gt;cond3
+op2-&gt;op3-&gt;cond3
+cond3(yes,right)-&gt;op6
+cond3(no)-&gt;op4-&gt;op5-&gt;op6
+op6-&gt;e</textarea><textarea id="flowchart-0-options" style="display: none">{"scale":1,"line-width":2,"line-length":50,"text-margin":10,"font-size":12}</textarea><script>  var code = document.getElementById("flowchart-0-code").value;  var options = JSON.parse(decodeURIComponent(document.getElementById("flowchart-0-options").value));  var diagram = flowchart.parse(code);  diagram.drawSVG("flowchart-0", options);</script></li>
+</ul>
+]]></content>
+      <categories>
+        <category>Computer Science</category>
+        <category>Npm</category>
+      </categories>
+      <tags>
+        <tag>npm</tag>
+        <tag>structure</tag>
+        <tag>package</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Cache</title>
     <url>/Cache.html</url>
     <content><![CDATA[<p><strong><em>Brief Intro</em></strong> ：<em>Telling about differences among several cache methods</em></p>
