@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://judiecarey.github.io/MongoDB-ORM.html</loc>
+    
+    <lastmod>2022-11-23</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://judiecarey.github.io/Npm.html</loc>
     
     <lastmod>2022-11-09</lastmod>
@@ -162,20 +171,6 @@
   </url>
   
   <url>
-    <loc>https://judiecarey.github.io/tags/cache/</loc>
-    <lastmod>2022-11-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://judiecarey.github.io/tags/http/</loc>
-    <lastmod>2022-11-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://judiecarey.github.io/tags/react/</loc>
     <lastmod>2022-11-23</lastmod>
     <changefreq>weekly</changefreq>
@@ -191,6 +186,20 @@
   
   <url>
     <loc>https://judiecarey.github.io/tags/architecture/</loc>
+    <lastmod>2022-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://judiecarey.github.io/tags/cache/</loc>
+    <lastmod>2022-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://judiecarey.github.io/tags/http/</loc>
     <lastmod>2022-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -253,6 +262,34 @@
   </url>
   
   <url>
+    <loc>https://judiecarey.github.io/tags/life-cycle/</loc>
+    <lastmod>2022-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://judiecarey.github.io/tags/database/</loc>
+    <lastmod>2022-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://judiecarey.github.io/tags/mongodb/</loc>
+    <lastmod>2022-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://judiecarey.github.io/tags/nodejs/</loc>
+    <lastmod>2022-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://judiecarey.github.io/tags/npm/</loc>
     <lastmod>2022-11-23</lastmod>
     <changefreq>weekly</changefreq>
@@ -268,13 +305,6 @@
   
   <url>
     <loc>https://judiecarey.github.io/tags/package/</loc>
-    <lastmod>2022-11-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://judiecarey.github.io/tags/life-cycle/</loc>
     <lastmod>2022-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -297,13 +327,6 @@
   </url>
   
   <url>
-    <loc>https://judiecarey.github.io/categories/Computer-Science/</loc>
-    <lastmod>2022-11-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://judiecarey.github.io/categories/React/</loc>
     <lastmod>2022-11-23</lastmod>
     <changefreq>weekly</changefreq>
@@ -311,7 +334,14 @@
   </url>
   
   <url>
-    <loc>https://judiecarey.github.io/categories/Computer-Science/Http-Cache/</loc>
+    <loc>https://judiecarey.github.io/categories/Computer-Science/</loc>
+    <lastmod>2022-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://judiecarey.github.io/categories/React/Fiber/</loc>
     <lastmod>2022-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -319,6 +349,13 @@
   
   <url>
     <loc>https://judiecarey.github.io/categories/React/Concept/</loc>
+    <lastmod>2022-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://judiecarey.github.io/categories/Computer-Science/Http-Cache/</loc>
     <lastmod>2022-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -346,13 +383,6 @@
   </url>
   
   <url>
-    <loc>https://judiecarey.github.io/categories/Computer-Science/Npm/</loc>
-    <lastmod>2022-11-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://judiecarey.github.io/categories/React/React-Life-Cycle/</loc>
     <lastmod>2022-11-23</lastmod>
     <changefreq>weekly</changefreq>
@@ -360,7 +390,7 @@
   </url>
   
   <url>
-    <loc>https://judiecarey.github.io/categories/React/Fiber/</loc>
+    <loc>https://judiecarey.github.io/categories/MongoDB/</loc>
     <lastmod>2022-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -374,7 +404,7 @@
   </url>
   
   <url>
-    <loc>https://judiecarey.github.io/categories/React/Fiber/Fiber-Concept/</loc>
+    <loc>https://judiecarey.github.io/categories/Computer-Science/Npm/</loc>
     <lastmod>2022-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -382,6 +412,13 @@
   
   <url>
     <loc>https://judiecarey.github.io/categories/JS/TS/</loc>
+    <lastmod>2022-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://judiecarey.github.io/categories/React/Fiber/Fiber-Concept/</loc>
     <lastmod>2022-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>

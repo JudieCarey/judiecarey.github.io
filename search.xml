@@ -1,6 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>MongoDB-ORM</title>
+    <url>/MongoDB-ORM.html</url>
+    <content><![CDATA[<p><strong><em>Brief Intro</em></strong> ：<em>Telling the differences among several nodejs oriented mongodb orm</em></p>
+<ul>
+<li>typeOrm</li>
+<li>Prisma</li>
+<li>Sequelize</li>
+</ul>
+<span id="more"></span>
+
+<h1 id="TypeOrm"><a href="#TypeOrm" class="headerlink" title="TypeOrm"></a>TypeOrm</h1><p><a href="https://typeorm.io/">官网</a><br><a href="https://github.com/typeorm/typeorm">Github</a></p>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>TypeORM 是一个运行在 NodeJS、Browser、Cordova、PhoneGap、Ionic、React Native、Expo 和 Electron 平台上的一个 ORM 框架，可以与 TypeScript 和 JavaScript 一起使用。它的目标是始终支持最新的 JavaScript 特性并提供额外的特性以帮助你开发任何使用数据库的应用程序</p>
+<h2 id="支持语言"><a href="#支持语言" class="headerlink" title="支持语言"></a>支持语言</h2><p>MySQL、MariaDB、PostgreSQL、SQLite、Microsoft SQL Server、sql.js、Oracle、MongoDB&nbsp;(试验性)、NativeScript,&nbsp;react-native&nbsp;和&nbsp;Cordova</p>
+<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><ul>
+<li>同时支持 <a href="https://github.com/typeorm/typeorm/blob/master/docs/active-record-data-mapper.md#what-is-the-active-record-pattern"><strong>ActiceRecord</strong></a> 和 <a href="https://github.com/typeorm/typeorm/blob/master/docs/active-record-data-mapper.md#what-is-the-data-mapper-pattern"><strong>DataMapper</strong></a></li>
+<li> 完美集成到 NestJs 框架</li>
+<li>对 TS 高度支持，简洁以及支持装饰器语法</li>
+<li>参考了其他优秀 ORM 的实现，例如 Hibernate，Doctrine 和 EntityFramework</li>
+</ul>
+<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><ul>
+<li>对 Mongo 数据库支持度是试验性的，后期支持度怎样具体不知</li>
+<li>近一年多未继续维护，存在一些坑，issue 积压较多</li>
+<li>没有特别完备的 API 文档，说明不清晰，只有教程和示例</li>
+</ul>
+<h1 id="Prisma"><a href="#Prisma" class="headerlink" title="Prisma"></a>Prisma</h1><p><a href="https://prisma.yoga/">官网</a><br><a href="https://github.com/prisma/prisma">Github</a></p>
+<h2 id="简介-1"><a href="#简介-1" class="headerlink" title="简介"></a>简介</h2><p>Prisma 是一个开源的数据库工具链项目，帮助开发人员更快地构建应用程序并减少错误，支持 PostgreSQL、MySQL、MongoDB、SQL Server 和 SQLite。</p>
+<h2 id="优点-1"><a href="#优点-1" class="headerlink" title="优点"></a>优点</h2><ul>
+<li>提供干净和类型安全的 API 体积哦啊数据库查询，同时返回普通的 JS 对象，更容易进行数据库查询</li>
+<li>自带 CRUD 封装、提供 VSCode 扩展插件、语法高亮、智能自动补全</li>
+<li>文档详细全面，当前呼声较高，</li>
+<li>支持多个数据库。在 SQL 和 NoSQL 数据库之间移动时，这对开发人员来说是一个巨大的优势，因为只需要更改 Schema 文件。所有其他操作 / 查询保持不变</li>
+<li>对 TS 支持很好，当前主力维护是 ts-toolbelt 的作者 Pierre-Antoine Mills，prisma 会自动生成几乎所有的类型，会自动注入 ts-toolbelt</li>
+<li> 背后是商业公司维护，不存在 typeOrm 断更的情况</li>
+</ul>
+<h2 id="缺点-1"><a href="#缺点-1" class="headerlink" title="缺点"></a>缺点</h2><ul>
+<li>和 TypeOrm 一样，对 Mongo 的支持也停留在试验阶段</li>
+<li>不支持多个模型文件。所有模型都需要写入 <code>schema.prisma</code> 文件，这使得文件杂乱无章，难以调试和阅读</li>
+<li>目前没有嵌入式集合支持</li>
+<li>目前不支持 @@id 和自增</li>
+</ul>
+<h1 id="Sequelize"><a href="#Sequelize" class="headerlink" title="Sequelize"></a>Sequelize</h1><p><a href="https://sequelize.org/">官网</a><br><a href="https://github.com/sequelize/sequelize">Github</a></p>
+<h2 id="缺点-2"><a href="#缺点-2" class="headerlink" title="缺点"></a>缺点</h2><ul>
+<li>不支持 Mongo，直接 pass</li>
+</ul>
+<h1 id="几种ORM对比"><a href="#几种ORM对比" class="headerlink" title="几种ORM对比"></a>几种 ORM 对比</h1><ul>
+<li>Prisma 和 TypeOrm：<a href="https://prisma.yoga/concepts/more/comparisons/prisma-and-typeorm">https://prisma.yoga/concepts/more/comparisons/prisma-and-typeorm</a></li>
+<li>Prisma 和 Mongoose：<a href="https://prisma.yoga/concepts/more/comparisons/prisma-and-mongoose">https://prisma.yoga/concepts/more/comparisons/prisma-and-mongoose</a></li>
+<li>Prisma 和 Sequelize：<a href="https://prisma.yoga/concepts/more/comparisons/prisma-and-sequelize">https://prisma.yoga/concepts/more/comparisons/prisma-and-sequelize</a></li>
+</ul>
+<p><em><strong>其他参考</strong></em></p>
+<blockquote>
+<p><a href="https://devpress.csdn.net/mongodb/62f9855ec6770329307feb25.html">从 Mongoose 到 MongoDB 的 PrismaORM 之旅！</a><br><a href="https://zhuanlan.zhihu.com/p/533245292">使用 NestJS 和 Prisma 创建 REST API</a><br><a href="https://www.nestjs.com.cn/recipes/prisma">NestJS 官网配置 Prisma</a><br><a href="https://www.prisma.io/docs/guides/database/using-prisma-with-mongodb">Using Prisma with MongoDB</a><br><a href="https://zhuanlan.zhihu.com/p/568353578">Prisma 搭配使用 MongoDB 官方指南（中文指导版）</a></p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>MongoDB</category>
+      </categories>
+      <tags>
+        <tag>database</tag>
+        <tag>mongodb</tag>
+        <tag>nodejs</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Npm</title>
     <url>/Npm.html</url>
     <content><![CDATA[<p><strong><em>Brief Intro</em></strong> ：<em>Summarize the process while starting a frontend project and what npm do during after ‘npm start’ and other knowledges related to npm</em></p>
