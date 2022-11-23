@@ -29,10 +29,10 @@ https://judiecarey.github.io/tags/fiber/
 https://judiecarey.github.io/tags/gc/
 https://judiecarey.github.io/tags/git/
 https://judiecarey.github.io/tags/hooks/
-https://judiecarey.github.io/tags/life-cycle/
 https://judiecarey.github.io/tags/npm/
 https://judiecarey.github.io/tags/structure/
 https://judiecarey.github.io/tags/package/
+https://judiecarey.github.io/tags/life-cycle/
 https://judiecarey.github.io/tags/ts/
 https://judiecarey.github.io/categories/JS/
 https://judiecarey.github.io/categories/Computer-Science/
@@ -42,9 +42,9 @@ https://judiecarey.github.io/categories/React/Concept/
 https://judiecarey.github.io/categories/Git/
 https://judiecarey.github.io/categories/React/Hooks/
 https://judiecarey.github.io/categories/React/Diff/
-https://judiecarey.github.io/categories/React/React-Life-Cycle/
 https://judiecarey.github.io/categories/Computer-Science/Npm/
+https://judiecarey.github.io/categories/React/React-Life-Cycle/
 https://judiecarey.github.io/categories/React/Fiber/
-https://judiecarey.github.io/categories/JS/TS/
 https://judiecarey.github.io/categories/React/Fiber/Fiber-Architecture/
 https://judiecarey.github.io/categories/React/Fiber/Fiber-Concept/
+https://judiecarey.github.io/categories/JS/TS/

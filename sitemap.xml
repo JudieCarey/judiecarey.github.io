@@ -253,13 +253,6 @@
   </url>
   
   <url>
-    <loc>https://judiecarey.github.io/tags/life-cycle/</loc>
-    <lastmod>2022-11-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://judiecarey.github.io/tags/npm/</loc>
     <lastmod>2022-11-23</lastmod>
     <changefreq>weekly</changefreq>
@@ -275,6 +268,13 @@
   
   <url>
     <loc>https://judiecarey.github.io/tags/package/</loc>
+    <lastmod>2022-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://judiecarey.github.io/tags/life-cycle/</loc>
     <lastmod>2022-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -346,13 +346,6 @@
   </url>
   
   <url>
-    <loc>https://judiecarey.github.io/categories/React/React-Life-Cycle/</loc>
-    <lastmod>2022-11-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://judiecarey.github.io/categories/Computer-Science/Npm/</loc>
     <lastmod>2022-11-23</lastmod>
     <changefreq>weekly</changefreq>
@@ -360,14 +353,14 @@
   </url>
   
   <url>
-    <loc>https://judiecarey.github.io/categories/React/Fiber/</loc>
+    <loc>https://judiecarey.github.io/categories/React/React-Life-Cycle/</loc>
     <lastmod>2022-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://judiecarey.github.io/categories/JS/TS/</loc>
+    <loc>https://judiecarey.github.io/categories/React/Fiber/</loc>
     <lastmod>2022-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -382,6 +375,13 @@
   
   <url>
     <loc>https://judiecarey.github.io/categories/React/Fiber/Fiber-Concept/</loc>
+    <lastmod>2022-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://judiecarey.github.io/categories/JS/TS/</loc>
     <lastmod>2022-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
