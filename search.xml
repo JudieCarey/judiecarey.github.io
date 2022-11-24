@@ -3,30 +3,35 @@
   <entry>
     <title>MongoDB-ORM</title>
     <url>/MongoDB-ORM.html</url>
-    <content><![CDATA[<p><strong><em>Brief Intro</em></strong> ：<em>Telling the differences among several nodejs oriented mongodb orm</em></p>
+    <content><![CDATA[<p><strong><em>Brief Intro</em></strong> ：<em>Telling the differences among nodejs oriented mongodb orm frameworks</em></p>
 <ul>
-<li>typeOrm</li>
+<li>Mongoose</li>
 <li>Prisma</li>
+<li>TypeOrm</li>
 <li>Sequelize</li>
 </ul>
 <span id="more"></span>
 
-<h1 id="TypeOrm"><a href="#TypeOrm" class="headerlink" title="TypeOrm"></a>TypeOrm</h1><p><a href="https://typeorm.io/">官网</a><br><a href="https://github.com/typeorm/typeorm">Github</a></p>
-<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>TypeORM 是一个运行在 NodeJS、Browser、Cordova、PhoneGap、Ionic、React Native、Expo 和 Electron 平台上的一个 ORM 框架，可以与 TypeScript 和 JavaScript 一起使用。它的目标是始终支持最新的 JavaScript 特性并提供额外的特性以帮助你开发任何使用数据库的应用程序</p>
-<h2 id="支持语言"><a href="#支持语言" class="headerlink" title="支持语言"></a>支持语言</h2><p>MySQL、MariaDB、PostgreSQL、SQLite、Microsoft SQL Server、sql.js、Oracle、MongoDB&nbsp;(试验性)、NativeScript,&nbsp;react-native&nbsp;和&nbsp;Cordova</p>
-<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><ul>
-<li>同时支持 <a href="https://github.com/typeorm/typeorm/blob/master/docs/active-record-data-mapper.md#what-is-the-active-record-pattern"><strong>ActiceRecord</strong></a> 和 <a href="https://github.com/typeorm/typeorm/blob/master/docs/active-record-data-mapper.md#what-is-the-data-mapper-pattern"><strong>DataMapper</strong></a></li>
-<li> 完美集成到 NestJs 框架</li>
-<li>对 TS 高度支持，简洁以及支持装饰器语法</li>
-<li>参考了其他优秀 ORM 的实现，例如 Hibernate，Doctrine 和 EntityFramework</li>
+<h1 id="Mongoose"><a href="#Mongoose" class="headerlink" title="Mongoose"></a>Mongoose</h1><p><a href="https://prisma.yoga/">官网</a><br><a href="https://github.com/prisma/prisma">Github</a></p>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Mongoose 是对 node 环境中 MongoDB 数据库操作的封装，一个对象模型工具，将数据库中的数据转换为 JavaScript 对象以供我们在应用中使用。</p>
+<h2 id="使用事务"><a href="#使用事务" class="headerlink" title="使用事务"></a>使用事务</h2><figure class="highlight javascript"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">register</span> = <span class="keyword">async</span> (<span class="params"></span>) =&gt; {</span><br><span class="line">    <span class="keyword">const</span> session = <span class="keyword">await</span> conn.<span class="title function_">startSession</span>();</span><br><span class="line">    <span class="keyword">try</span> {</span><br><span class="line">        session.<span class="title function_">startTransaction</span>();                    </span><br><span class="line">        <span class="keyword">const</span> user = <span class="keyword">await</span> <span class="title class_">User</span>.<span class="title function_">create</span>([</span><br><span class="line">            { <span class="attr">name</span>: <span class="string">'Van Helsing'</span> }</span><br><span class="line">        ], { session });</span><br><span class="line">        <span class="keyword">await</span> <span class="title class_">ShippingAddress</span>.<span class="title function_">create</span>([</span><br><span class="line">            { <span class="attr">address</span>: <span class="string">'Transylvania'</span>,</span><br><span class="line">              <span class="attr">user_id</span>: user.<span class="property">id</span></span><br><span class="line">            }</span><br><span class="line">        ], { session });</span><br><span class="line">        <span class="keyword">await</span> session.<span class="title function_">commitTransaction</span>();</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">'success'</span>);</span><br><span class="line">    } <span class="keyword">catch</span> (error) {</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">'error'</span>);</span><br><span class="line">        <span class="keyword">await</span> session.<span class="title function_">abortTransaction</span>();</span><br><span class="line">    }</span><br><span class="line">    session.<span class="title function_">endSession</span>();</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<p>更多参考：</p>
+<ul>
+<li><strong><a href="https://mongoosejs.com/docs/transactions.html">Transactions in Mongoose</a></strong></li>
+<li><strong><a href="https://www.ultimateakash.com/blog-details/IiwzQGAKYAo=/How-to-implement-Transactions-in-Mongoose-&amp;-Node.Js-(Express)">How to implement Transactions in Mongoose &amp; Node.Js</a></strong></li>
 </ul>
-<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><ul>
-<li>对 Mongo 数据库支持度是试验性的，后期支持度怎样具体不知</li>
-<li>近一年多未继续维护，存在一些坑，issue 积压较多</li>
-<li>没有特别完备的 API 文档，说明不清晰，只有教程和示例</li>
+<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><ul>
+<li>上手简单，面向 nodejs 和 mongoDB 的第一选择</li>
+<li>可以为文档创建一个模式结构（Schema）</li>
+<li>可以对模型中的对象 / 文档进行验证</li>
+<li>可以通过类型转换转换为对象模型</li>
+<li>可以使用中间件来应用业务逻辑挂钩</li>
+<li>比 node 原生驱动 MongoDB 更容易</li>
 </ul>
 <h1 id="Prisma"><a href="#Prisma" class="headerlink" title="Prisma"></a>Prisma</h1><p><a href="https://prisma.yoga/">官网</a><br><a href="https://github.com/prisma/prisma">Github</a></p>
 <h2 id="简介-1"><a href="#简介-1" class="headerlink" title="简介"></a>简介</h2><p>Prisma 是一个开源的数据库工具链项目，帮助开发人员更快地构建应用程序并减少错误，支持 PostgreSQL、MySQL、MongoDB、SQL Server 和 SQLite。</p>
+<h2 id="使用事务-1"><a href="#使用事务-1" class="headerlink" title="使用事务"></a>使用事务</h2><figure class="highlight javascript"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> session = db.<span class="title function_">getMongo</span>().<span class="title function_">startSession</span>();</span><br><span class="line"></span><br><span class="line"><span class="comment">// start</span></span><br><span class="line">session.<span class="title function_">startTransaction</span>(</span><br><span class="line">    { <span class="string">"readConcern"</span>: { <span class="string">"level"</span>: <span class="string">"snapshot"</span> },</span><br><span class="line">      <span class="string">"writeConcern"</span>: { <span class="string">"w"</span>: <span class="string">"majority"</span> }}</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">// run</span></span><br><span class="line"><span class="keyword">var</span> authors = session.<span class="title function_">getDatabase</span>(<span class="string">'literature'</span>).<span class="title function_">getCollection</span>(<span class="string">'authors'</span>)</span><br><span class="line">authors.<span class="title function_">insertOne</span>( {</span><br><span class="line">    <span class="string">"first_name"</span>: <span class="string">"Virginie"</span>,</span><br><span class="line">    <span class="string">"last_name"</span>: <span class="string">"Despentes"</span>,</span><br><span class="line">    <span class="string">"title"</span>: <span class="string">"Vernon Subutex"</span>)}</span><br><span class="line">)</span><br><span class="line">session.<span class="title function_">commitTransaction</span>()</span><br><span class="line"></span><br><span class="line"><span class="comment">// Abort</span></span><br><span class="line">session.<span class="title function_">abortTransaction</span>()</span><br></pre></td></tr></tbody></table></figure>
+<p>官方文档： <strong><a href="https://www.prisma.io/dataguide/mongodb/mongodb-transactions#how-do-you-use-transactions">How-To-Use-Transaction</a></strong></p>
 <h2 id="优点-1"><a href="#优点-1" class="headerlink" title="优点"></a>优点</h2><ul>
 <li>提供干净和类型安全的 API，小体积数据库查询，同时返回普通的 JS 对象，更容易进行数据库查询</li>
 <li>自带 CRUD 封装、提供 VSCode 扩展插件、语法高亮、智能自动补全</li>
@@ -35,17 +40,31 @@
 <li>对 TS 支持很好，当前主力维护是 ts-toolbelt 的作者 Pierre-Antoine Mills，prisma 会自动生成几乎所有的类型，会自动注入 ts-toolbelt</li>
 <li> 背后是商业公司维护，不存在 typeOrm 断更的情况</li>
 </ul>
-<h2 id="缺点-1"><a href="#缺点-1" class="headerlink" title="缺点"></a>缺点</h2><ul>
+<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><ul>
 <li>和 TypeOrm 一样，对 Mongo 的支持也停留在试验阶段</li>
 <li>不支持多个模型文件。所有模型都需要写入 <code>schema.prisma</code> 文件，这使得文件杂乱无章，难以调试和阅读</li>
 <li>目前没有嵌入式集合支持</li>
 <li>目前不支持 @@id 和自增</li>
 </ul>
+<h1 id="TypeOrm"><a href="#TypeOrm" class="headerlink" title="TypeOrm"></a>TypeOrm</h1><p><a href="https://typeorm.io/">官网</a><br><a href="https://github.com/typeorm/typeorm">Github</a></p>
+<h2 id="简介-2"><a href="#简介-2" class="headerlink" title="简介"></a>简介</h2><p>TypeORM 是一个运行在 NodeJS、Browser、Cordova、PhoneGap、Ionic、React Native、Expo 和 Electron 平台上的一个 ORM 框架，可以与 TypeScript 和 JavaScript 一起使用。它的目标是始终支持最新的 JavaScript 特性并提供额外的特性以帮助你开发任何使用数据库的应用程序</p>
+<h2 id="支持语言"><a href="#支持语言" class="headerlink" title="支持语言"></a>支持语言</h2><p>MySQL、MariaDB、PostgreSQL、SQLite、Microsoft SQL Server、sql.js、Oracle、MongoDB&nbsp;(试验性)、NativeScript,&nbsp;react-native&nbsp; 和 &nbsp;Cordova</p>
+<h2 id="优点-2"><a href="#优点-2" class="headerlink" title="优点"></a>优点</h2><ul>
+<li>同时支持 <a href="https://github.com/typeorm/typeorm/blob/master/docs/active-record-data-mapper.md#what-is-the-active-record-pattern"><strong>ActiceRecord</strong></a> 和 <a href="https://github.com/typeorm/typeorm/blob/master/docs/active-record-data-mapper.md#what-is-the-data-mapper-pattern"><strong>DataMapper</strong></a></li>
+<li> 完美集成到 NestJs 框架</li>
+<li>对 TS 高度支持，简洁以及支持装饰器语法</li>
+<li>参考了其他优秀 ORM 的实现，例如 Hibernate，Doctrine 和 EntityFramework</li>
+</ul>
+<h2 id="缺点-1"><a href="#缺点-1" class="headerlink" title="缺点"></a>缺点</h2><ul>
+<li>对 Mongo 数据库支持度是试验性的，后期支持度怎样具体不知</li>
+<li>近一年多未继续维护，存在一些坑，issue 积压较多</li>
+<li>没有特别完备的 API 文档，说明不清晰，只有教程和示例</li>
+</ul>
 <h1 id="Sequelize"><a href="#Sequelize" class="headerlink" title="Sequelize"></a>Sequelize</h1><p><a href="https://sequelize.org/">官网</a><br><a href="https://github.com/sequelize/sequelize">Github</a></p>
 <h2 id="缺点-2"><a href="#缺点-2" class="headerlink" title="缺点"></a>缺点</h2><ul>
 <li>不支持 Mongo，直接 pass</li>
 </ul>
-<h1 id="几种ORM对比"><a href="#几种ORM对比" class="headerlink" title="几种ORM对比"></a>几种 ORM 对比</h1><ul>
+<h1 id="几种-ORM-对比"><a href="#几种-ORM-对比" class="headerlink" title="几种 ORM 对比"></a>几种 ORM 对比</h1><ul>
 <li>Prisma 和 TypeOrm：<a href="https://prisma.yoga/concepts/more/comparisons/prisma-and-typeorm">https://prisma.yoga/concepts/more/comparisons/prisma-and-typeorm</a></li>
 <li>Prisma 和 Mongoose：<a href="https://prisma.yoga/concepts/more/comparisons/prisma-and-mongoose">https://prisma.yoga/concepts/more/comparisons/prisma-and-mongoose</a></li>
 <li>Prisma 和 Sequelize：<a href="https://prisma.yoga/concepts/more/comparisons/prisma-and-sequelize">https://prisma.yoga/concepts/more/comparisons/prisma-and-sequelize</a></li>
@@ -62,6 +81,8 @@
         <tag>database</tag>
         <tag>mongodb</tag>
         <tag>nodejs</tag>
+        <tag>mongoose</tag>
+        <tag>prisma</tag>
       </tags>
   </entry>
   <entry>
