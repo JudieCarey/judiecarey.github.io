@@ -281,7 +281,7 @@ op6-&gt;e</textarea><textarea id="flowchart-0-options" style="display: none">{"s
 <li> cache-control 设置为 no-cache</li>
 </ul>
 <p>满足以上条件时，浏览器进入协商缓存，如果命中则返回 304 状态码，如果没有命中，则重新请求资源，返回 200 状态码</p>
-<h2 id="last-modified-x2F-if-modified-since"><a href="#last-modified-x2F-if-modified-since" class="headerlink" title="last-modified/if-modified-since"></a>last-modified/if-modified-since</h2><ul>
+<h2 id="last-modified-if-modified-since"><a href="#last-modified-if-modified-since" class="headerlink" title="last-modified/if-modified-since"></a>last-modified/if-modified-since</h2><ul>
 <li>第一次请求的时候会带上 <code>last-modified</code>，返回资源在服务端最后被修改的时间</li>
 <li>再次请求的时候，请求头会带上 <code>if-modified-since</code>，根据资源的最后修改时间判断是否命中缓存<ul>
 <li>命中后返回 304，并不返回资源内容</li>
@@ -289,7 +289,7 @@ op6-&gt;e</textarea><textarea id="flowchart-0-options" style="display: none">{"s
 </ul>
 </li>
 </ul>
-<h2 id="etag-x2F-if-none-match"><a href="#etag-x2F-if-none-match" class="headerlink" title="etag/if-none-match"></a>etag/if-none-match</h2><ul>
+<h2 id="etag-if-none-match"><a href="#etag-if-none-match" class="headerlink" title="etag/if-none-match"></a>etag/if-none-match</h2><ul>
 <li><code>etag</code> 返回的是当前资源文件的唯一标识（服务器生成）</li>
 <li><code>if-no-match</code> 是客户端发起该请求的时候，携带上次请求返回的唯一标识 etag 值<ul>
 <li><code>if-no-match</code> 字段值与资源在服务器的 <code>etag</code> 值作对比，一致则返回 304</li>
