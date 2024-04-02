@@ -1,0 +1,1063 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>CORS</title>
+    <url>/CORS.html</url>
+    <content><![CDATA[<p><em><strong>Brief Intro</strong></em>：<em>cors introduction and ways to solve it</em></p>
+<ul>
+<li>简单请求</li>
+<li>非简单请求</li>
+<li> JSONP<span id="more"></span></li>
+</ul>
+<h1 id="跨域含义"><a href="#跨域含义" class="headerlink" title="跨域含义"></a>跨域含义</h1><p><a href="http://www.google.com/">http://www.google.com:80</a><br>协议、域名、端口三者其中之一不一样进行请求都属于跨域请求</p>
+<h1 id="简单请求和非简单请求"><a href="#简单请求和非简单请求" class="headerlink" title="简单请求和非简单请求"></a>简单请求和非简单请求</h1><h2 id="简单请求"><a href="#简单请求" class="headerlink" title="简单请求"></a>简单请求</h2><h3 id="条件"><a href="#条件" class="headerlink" title="条件"></a>条件</h3><p>1、请求方法为：<strong>HEAD、GET、POST</strong><br>2、HTTP 头信息不超过字段：<strong>Accet、Accept-Language、Content-Language、Last-Event-ID、Content-Type：只限于三个值 application/x-www-form-urlencoded、multipart/form-data、text/plain</strong></p>
+<h3 id="请求方式"><a href="#请求方式" class="headerlink" title="请求方式"></a>请求方式</h3><p>在头信息中增加一个 <code>origin</code> 字段，用来说明本次请求来自哪个源，服务器决定是否同意该请求</p>
+<blockquote>
+<p>GET /cors? HTTP/1.1<br>Host: localhost:2333<br>Connection: keep-alive<br>Origin: <a href="http://localhost:2332/">http://localhost:2332</a><br>User-Agent: Mozilla/5.0 (WindowsNT10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98Safari/537.36<br>Accept: <em>/</em></p>
+</blockquote>
+<p>如果 <code>origin</code> 指定的源不在允许范围内，会返回一个正常的 HTTP 回应。如果头信息中没有包含 <code>Access-Control-Allow-Origin</code> 就会抛出错误</p>
+<blockquote>
+<p>Access-Control-Allow-Origin: <a href="http://localhost:2332/">http://localhost:2332</a>  （必填，接收哪些域名请求）<br>Access-Control-Allow-Credentials: true （可选，是否可以发送 Cookie）<br>Access-Control-Expose-Headers: FooBar  （可选，除了 6 种服务器基本字段，其他可指定）<br>Content-Type: text/html; charset=utf-8</p>
+</blockquote>
+<h3 id="携带Cookie"><a href="#携带Cookie" class="headerlink" title="携带Cookie"></a>携带 Cookie</h3><p>服务端与客户端都需要设置<br>服务端：<code>Access-Control-Allow-Origin：http://xxx:${port}</code><br><code>Access-Control-Allow-Credentials: true</code><br>客户端：<code>withCredentials = true</code></p>
+<h2 id="非简单请求"><a href="#非简单请求" class="headerlink" title="非简单请求"></a>非简单请求</h2><h3 id="预检请求"><a href="#预检请求" class="headerlink" title="预检请求"></a>预检请求</h3><p>一般对于请求方式为 PUT、DELETE 或者是 ContentType：application/json 等特殊服务器请求；<br>非简单请求的 CORS 会在正式通信之前做一次预检请求，来判断当前域名是否在服务器的许可范围名单之内，以及可以使用哪些 HTTP 方法和头信息字段，肯定回复后浏览器发出正式的 <code>XMLHttpRequest</code> 请求。</p>
+<blockquote>
+<p>var url = ‘<a href="http://api.alice.com/cors';">http://api.alice.com/cors';</a><br>var xhr = new XMLHttpRequest();<br>xhr.open(‘PUT’, url, true);<br>xhr.setRequestHeader(‘X-Custom-Header’, ‘value’);<br>xhr.send();</p>
+</blockquote>
+<p>以上是一个非简单请求，请求方式为 PUT，发送一个自定义头信息 X-Custom-Header，浏览器会发送一个 “预检” 请求</p>
+<blockquote>
+<p>OPTIONS /cors HTTP/1.1<br>Origin: <a href="http://api.bob.com/">http://api.bob.com</a><br>Access-Control-Request-Method: PUT<br>Access-Control-Request-Headers: X-Custom-Header<br>Host: api.alice.com<br>Accept-Language: en-US<br>Connection: keep-alive<br>User-Agent: Mozilla/5.0…</p>
+</blockquote>
+<p>预检的请求方法为 <code>OPTIONS</code>，表示用来询问。检查完 Origin、 Access-Control-Request-Method 和 Access-Control-Request-Headers 字段以后，确认允许跨源请求。下面是预检请求的响应头</p>
+<blockquote>
+<p>HTTP/1.1 200 OK<br>Date: Mon, 01 Dec 2008 01:15:39 GMT<br>Server: Apache/2.0.61 (Unix)<br>Access-Control-Allow-Origin: <a href="http://api.bob.com/">http://api.bob.com</a>  （* 表示所有任意跨域请求）<br>Access-Control-Allow-Methods: GET, POST, PUT （必须，表明服务器支持的请求方式）<br>Access-Control-Allow-Headers: X-Custom-Header<br>Content-Type: text/html; charset=utf-8<br>Content-Encoding: gzip<br>Content-Length: 0<br>Keep-Alive: timeout=2, max=100<br>Connection: Keep-Alive</p>
+</blockquote>
+<p>如果拒绝了预检请求，返回的头信息中没有任何包括 CORS 相关信息</p>
+<blockquote>
+<p>OPTIONS <a href="http://api.bob.com/">http://api.bob.com</a> HTTP/1.1<br>Status: 200<br>Access-Control-Allow-Origin: <a href="https://notyourdomain.com/">https://notyourdomain.com</a><br>Access-Control-Allow-Method: POST</p>
+</blockquote>
+<h1 id="与JOSNP比较"><a href="#与JOSNP比较" class="headerlink" title="与JOSNP比较"></a>与 JOSNP 比较</h1><p>JSONP 是通过 script、img、iframe 等不受同源策略限制的标签携带 src 进行跨域请求，并接受返回函数进行回调。因而只支持 GET 请求。<br>优点：JSONP 支持低版本浏览器。<br>CORS 更强大，支持所有的 HTTP 请求方式</p>
+]]></content>
+      <categories>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>cors</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Cache</title>
+    <url>/Cache.html</url>
+    <content><![CDATA[<p><strong><em>Brief Intro</em></strong>: <em>Telling about differences among several cache methods</em></p>
+<ul>
+<li>强缓存</li>
+<li>协商缓存</li>
+</ul>
+<span id="more"></span>
+
+<p><strong>强缓存和协商缓存都称做 HTTP 缓存，指的是在 HTTP 请求中，识别 HTTP 报文达到请求缓存的效果</strong></p>
+<h1 id="缓存位置"><a href="#缓存位置" class="headerlink" title="缓存位置"></a>缓存位置</h1><ul>
+<li>Service Worker：运行在浏览器背后的独立线程，它可以自由控制缓存哪些文件、如何匹配缓存、如何读取缓存，并且缓存是持续性的。因为它涉及到了请求拦截，所以必须为 HTTPS。</li>
+<li>Memory Cache：基于内存的缓存，读取高效速度快，但是一旦关闭网页，内存就释放了。</li>
+<li>Disk Cache：基于磁盘的缓存，容量大，读取慢</li>
+<li> Push Cache：推送缓存，http2 中的内容，缓存在会话 session 中的</li>
+</ul>
+<h1 id="强缓存"><a href="#强缓存" class="headerlink" title="强缓存"></a>强缓存</h1><p>访问 URL 的时候，不会发起服务器请求，直接读取缓存资源，但会返回 200 状态的结果。使用 http 头中的 <code>expires</code>（http1.0）和 <code>cache control</code>（http1.1）来控制。</p>
+<h2 id="Expires"><a href="#Expires" class="headerlink" title="Expires"></a>Expires</h2><p>是一个时间戳，用来缓存请求结果到期时间，在时间内直接使用缓存，过期了重新请求。</p>
+<h2 id="Cache-Control"><a href="#Cache-Control" class="headerlink" title="Cache-Control"></a>Cache-Control</h2><p>缓存优先级高于 expires，常用值为：</p>
+<ul>
+<li>private: 仅浏览器可以缓存</li>
+<li> public: 浏览器和代理服务器都可以缓存</li>
+<li> max-age=xxx：过期时间单位 (秒)</li>
+<li>no-cache：不进行强缓存</li>
+<li> no-store：不强缓存，也不协商缓存</li>
+</ul>
+<h1 id="协商缓存"><a href="#协商缓存" class="headerlink" title="协商缓存"></a>协商缓存</h1><h2 id="条件"><a href="#条件" class="headerlink" title="条件"></a>条件</h2><ul>
+<li>没有 cache-control 和 expires</li>
+<li>cache-control 和 expires 过期</li>
+<li> cache-control 设置为 no-cache</li>
+</ul>
+<p>满足以上条件时，浏览器进入协商缓存，如果命中则返回 304 状态码，如果没有命中，则重新请求资源，返回 200 状态码</p>
+<h2 id="last-modified-if-modified-since"><a href="#last-modified-if-modified-since" class="headerlink" title="last-modified/if-modified-since"></a>last-modified/if-modified-since</h2><ul>
+<li>第一次请求的时候会带上 <code>last-modified</code>，返回资源在服务端最后被修改的时间</li>
+<li>再次请求的时候，请求头会带上 <code>if-modified-since</code>，根据资源的最后修改时间判断是否命中缓存<ul>
+<li>命中后返回 304，并不返回资源内容</li>
+<li>未命中则重新请求</li>
+</ul>
+</li>
+</ul>
+<h2 id="etag-if-none-match"><a href="#etag-if-none-match" class="headerlink" title="etag/if-none-match"></a>etag/if-none-match</h2><ul>
+<li><code>etag</code> 返回的是当前资源文件的唯一标识（服务器生成）</li>
+<li><code>if-no-match</code> 是客户端发起该请求的时候，携带上次请求返回的唯一标识 etag 值<ul>
+<li><code>if-no-match</code> 字段值与资源在服务器的 <code>etag</code> 值作对比，一致则返回 304</li>
+<li> 不一致则重新返回资源文件，状态码 200</li>
+</ul>
+</li>
+</ul>
+<h1 id="用处"><a href="#用处" class="headerlink" title="用处"></a>用处</h1><ul>
+<li>HTML：协商缓存</li>
+<li> CSS、JS、图片：强缓存，文件名带上 hash</li>
+</ul>
+<h1 id="优先级"><a href="#优先级" class="headerlink" title="优先级"></a>优先级</h1><ul>
+<li>强缓存高于协商缓存</li>
+<li>协商缓存的 Etag 高于 Last-Modified</li>
+</ul>
+<img src="/Cache/cache.png" class="">
+]]></content>
+      <categories>
+        <category>Computer Science</category>
+        <category>Http Cache</category>
+      </categories>
+      <tags>
+        <tag>cache</tag>
+        <tag>http</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Concept and Architecture</title>
+    <url>/Concept-and-Architecture.html</url>
+    <content><![CDATA[<p><em><strong>Brief Intro</strong></em>：<em>Introduce React Concept &amp; Architechture By MindMap</em></p>
+<span id="more"></span>
+
+<h1 id="理念"><a href="#理念" class="headerlink" title="理念"></a>理念</h1>
+<div class="markmap-container" style="height:200px">
+  <svg data="{&quot;t&quot;:&quot;heading&quot;,&quot;d&quot;:1,&quot;p&quot;:{&quot;lines&quot;:[0,1]},&quot;v&quot;:&quot;React&quot;,&quot;c&quot;:[{&quot;t&quot;:&quot;heading&quot;,&quot;d&quot;:2,&quot;p&quot;:{&quot;lines&quot;:[2,3]},&quot;v&quot;:&quot;必备常识&quot;,&quot;c&quot;:[{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[3,4]},&quot;v&quot;:&quot;主流浏览器刷新率是60Hz，即每1000ms/60Hz,16,6ms刷新一次&quot;},{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[4,5]},&quot;v&quot;:&quot;JS可以操作DOM，GUI渲染和JS互斥&quot;}]},{&quot;t&quot;:&quot;heading&quot;,&quot;d&quot;:2,&quot;p&quot;:{&quot;lines&quot;:[6,7]},&quot;v&quot;:&quot;解决问题&quot;,&quot;c&quot;:[{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[7,8]},&quot;v&quot;:&quot;CPU&quot;},{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[8,9]},&quot;v&quot;:&quot;IO&quot;}]},{&quot;t&quot;:&quot;heading&quot;,&quot;d&quot;:2,&quot;p&quot;:{&quot;lines&quot;:[10,11]},&quot;v&quot;:&quot;解决方式&quot;,&quot;c&quot;:[{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[11,12]},&quot;v&quot;:&quot;CPU--&amp;gt;时间切片&quot;,&quot;c&quot;:[{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:6,&quot;p&quot;:{&quot;lines&quot;:[12,13]},&quot;v&quot;:&quot;同步更新--&amp;gt; 可中断异步更新&quot;}]},{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[14,15]},&quot;v&quot;:&quot;IO--&amp;gt;Suspense&quot;,&quot;c&quot;:[{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:6,&quot;p&quot;:{&quot;lines&quot;:[15,16]},&quot;v&quot;:&quot;同步更新--&amp;gt;可中断异步更新&quot;}]}]}]}"></svg>
+</div>
+
+
+<h1 id="老React架构（React15）"><a href="#老React架构（React15）" class="headerlink" title="老React架构（React15）"></a>老 React 架构（React15）</h1>
+<div class="markmap-container" style="height:200px">
+  <svg data="{&quot;t&quot;:&quot;heading&quot;,&quot;d&quot;:1,&quot;p&quot;:{&quot;lines&quot;:[0,1]},&quot;v&quot;:&quot;架构&quot;,&quot;c&quot;:[{&quot;t&quot;:&quot;heading&quot;,&quot;d&quot;:2,&quot;p&quot;:{&quot;lines&quot;:[2,3]},&quot;v&quot;:&quot;Reconciler(协调器)&quot;,&quot;c&quot;:[{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[3,4]},&quot;v&quot;:&quot;负责找出变化的组件&quot;,&quot;c&quot;:[{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:6,&quot;p&quot;:{&quot;lines&quot;:[4,5]},&quot;v&quot;:&quot;返回的JSX转为虚拟DOM&quot;},{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:6,&quot;p&quot;:{&quot;lines&quot;:[5,6]},&quot;v&quot;:&quot;本次更新虚拟DOM和上次更新的虚拟DOM对比&quot;},{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:6,&quot;p&quot;:{&quot;lines&quot;:[6,7]},&quot;v&quot;:&quot;找出变化的虚拟DOM&quot;},{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:6,&quot;p&quot;:{&quot;lines&quot;:[7,8]},&quot;v&quot;:&quot;通知Renderer&quot;}]}]},{&quot;t&quot;:&quot;heading&quot;,&quot;d&quot;:2,&quot;p&quot;:{&quot;lines&quot;:[9,10]},&quot;v&quot;:&quot;Renderer(渲染器)&quot;,&quot;c&quot;:[{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[10,11]},&quot;v&quot;:&quot;找到Recon的通知&quot;},{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[11,12]},&quot;v&quot;:&quot;负责将变化的组件渲染到页面上&quot;}]},{&quot;t&quot;:&quot;heading&quot;,&quot;d&quot;:2,&quot;p&quot;:{&quot;lines&quot;:[13,14]},&quot;v&quot;:&quot;缺点&quot;,&quot;c&quot;:[{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[14,15]},&quot;v&quot;:&quot;mount、update递归更新子组件&quot;,&quot;c&quot;:[{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:6,&quot;p&quot;:{&quot;lines&quot;:[15,16]},&quot;v&quot;:&quot;无法中断、层级深、更新时间长&quot;},{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:6,&quot;p&quot;:{&quot;lines&quot;:[16,17]},&quot;v&quot;:&quot;DOM同步更新&quot;}]}]}]}"></svg>
+</div>
+
+
+<h1 id="新React架构（React16）"><a href="#新React架构（React16）" class="headerlink" title="新React架构（React16）"></a>新 React 架构（React16）</h1>
+<div class="markmap-container" style="height:300px">
+  <svg data="{&quot;t&quot;:&quot;heading&quot;,&quot;d&quot;:1,&quot;p&quot;:{&quot;lines&quot;:[0,1]},&quot;v&quot;:&quot;架构&quot;,&quot;c&quot;:[{&quot;t&quot;:&quot;heading&quot;,&quot;d&quot;:2,&quot;p&quot;:{&quot;lines&quot;:[2,3]},&quot;v&quot;:&quot;Scheduler(调度器)&quot;,&quot;c&quot;:[{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[3,4]},&quot;v&quot;:&quot;和Reconciler都在内存中进行，完成后统一交给Renderer&quot;},{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[4,5]},&quot;v&quot;:&quot;调用任务优先级，高优先级进入Reconciler&quot;,&quot;c&quot;:[{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:6,&quot;p&quot;:{&quot;lines&quot;:[5,6]},&quot;v&quot;:&quot;当浏览器有剩余时间的时候通知&quot;}]}]},{&quot;t&quot;:&quot;heading&quot;,&quot;d&quot;:2,&quot;p&quot;:{&quot;lines&quot;:[7,8]},&quot;v&quot;:&quot;Reconciler(协调器)&quot;,&quot;c&quot;:[{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[8,9]},&quot;v&quot;:&quot;更新从递归变成可中断的循环过程&quot;},{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[9,10]},&quot;v&quot;:&quot;每次调用shouldYeild询问是否有时间&quot;},{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[10,11]},&quot;v&quot;:&quot;和Renderer不再交替工作，给更新的虚拟DOM打上标记&quot;}]},{&quot;t&quot;:&quot;heading&quot;,&quot;d&quot;:2,&quot;p&quot;:{&quot;lines&quot;:[12,13]},&quot;v&quot;:&quot;Renderer(渲染器)&quot;,&quot;c&quot;:[{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[13,14]},&quot;v&quot;:&quot;跟据Renderer打的标记执行相应DOM操作&quot;}]},{&quot;t&quot;:&quot;heading&quot;,&quot;d&quot;:2,&quot;p&quot;:{&quot;lines&quot;:[15,16]},&quot;v&quot;:&quot;优点&quot;,&quot;c&quot;:[{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[16,17]},&quot;v&quot;:&quot;Scheduler和Reconciler的操作都在内存中进行，不会更新页面上的DOM&quot;},{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[17,18]},&quot;v&quot;:&quot;用户不会感知更新不完全的组件&quot;}]}]}"></svg>
+</div>
+]]></content>
+      <categories>
+        <category>React</category>
+        <category>Concept</category>
+      </categories>
+      <tags>
+        <tag>react</tag>
+        <tag>concept</tag>
+        <tag>architecture</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>CreatePortal</title>
+    <url>/CreatePortal.html</url>
+    <content><![CDATA[<p><strong><em>Brief Intro</em></strong>: <em>Easy way to mount virtual react dom to GisMap under restricted accepting types circumstances</em></p>
+<span id="more"></span>
+
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><img src="/CreatePortal/mapboxgl.png" class="">
+<p>业务需求基于 mapoboxgl 封装二维 gis 地图，支持打点，画线及绘制面，即业务上的坐标点、轨迹线条和电子围栏区域。</p>
+<h1 id="createPortal-原理"><a href="#createPortal-原理" class="headerlink" title="createPortal 原理"></a>createPortal 原理</h1><ul>
+<li>Portal 将提供一种将子节点渲染到 DOM 节点中的方式，该节点存在于 DOM 组件的层次结构之外。</li>
+<li>适合脱离文档流 (out of flow) 的组件，特别是 position: absolute 与 position: fixed 的组件。比如模态框，通知，警告，goTop 等</li>
+</ul>
+<h1 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h1><h2 id="场景一：坐标点点击后弹框显示"><a href="#场景一：坐标点点击后弹框显示" class="headerlink" title="场景一：坐标点点击后弹框显示"></a>场景一：坐标点点击后弹框显示</h2><p><a href="https://docs.mapbox.com/mapbox-gl-js/example/popup/">官方示例</a> &lt;&lt; 传送门</p>
+<img src="/CreatePortal/map-popup.png" class="">
+<img src="/CreatePortal/map-example.png" class="">
+
+<h3 id="限制"><a href="#限制" class="headerlink" title="限制"></a>限制</h3><ul>
+<li>接受类型有限（当前官方示例中仅写了 HTML 和 DomContent）</li>
+<li>原生样式及标签写法较为麻烦</li>
+<li>数据量庞大的时候难以受控单个点位</li>
+<li>可扩展性不高，维护起来难度高</li>
+<li>组件视角看，不方便开发绘制定制化的展示内容</li>
+</ul>
+<h3 id="扩展方式"><a href="#扩展方式" class="headerlink" title="扩展方式"></a>扩展方式</h3><figure class="highlight jsx"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 首先创建一个DOM容器，用来嵌入业务中传入的自定义内容组件</span></span><br><span class="line"><span class="keyword">const</span> popupContentDom = <span class="variable language_">document</span>.<span class="title function_">createElement</span>(<span class="string">"div"</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> popup = <span class="keyword">new</span> mapboxgl.<span class="title class_">Popup</span>()</span><br><span class="line">  .<span class="title function_">setLngLat</span>(e.<span class="property">lngLat</span>)</span><br><span class="line">  .<span class="title function_">setDOMContent</span>(popupContentDom)</span><br><span class="line">  .<span class="title function_">addTo</span>(map);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 由于popup是mapboxgl内部提供的弹框方式，父容器已经绑定到mapboxgl</span></span><br><span class="line"><span class="comment">// 只要在渲染的地方通过createPortal把接收到的子组件挂载到popupContentDom下</span></span><br><span class="line"><span class="keyword">return</span> (</span><br><span class="line">  <span class="language-xml"><span class="tag">&lt;<span class="name">React.Fragment</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;<span class="name">MapGIS</span> <span class="attr">xxx</span> /&gt;</span></span></span><br><span class="line"><span class="language-xml">    {/* 这里是通过props.children的方式接受自定义内容组件 */}</span></span><br><span class="line"><span class="language-xml">    {props.children &amp;&amp; ReactDOM.createPortal(props.children, popupContentDom)}</span></span><br><span class="line"><span class="language-xml">  <span class="tag">&lt;/<span class="name">React.Fragment</span>&gt;</span></span></span><br><span class="line">);</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="场景二：自定义图标组件渲染到-gis-地图上"><a href="#场景二：自定义图标组件渲染到-gis-地图上" class="headerlink" title="场景二：自定义图标组件渲染到 gis 地图上"></a>场景二：自定义图标组件渲染到 gis 地图上</h2><h3 id="背景-1"><a href="#背景-1" class="headerlink" title="背景"></a>背景</h3><p>业务需要支持公司内部封装的图标组件渲染到 gis 地图上，通过调研发现可以使用 mapboxgl 的 Marker 进行标记点的添加，最后同样的方式挂载到地图上。</p>
+<h3 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h3><figure class="highlight jsx"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 注意：因为要接受自定义图标组件，这里要挂载的父容器变成了markerComp</span></span><br><span class="line"><span class="keyword">const</span> markerComp = <span class="variable language_">document</span>.<span class="title function_">createElement</span>(<span class="string">"div"</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> marker = <span class="keyword">new</span> mapboxgl.<span class="title class_">Marker</span>(markerComp)</span><br><span class="line">  .<span class="title function_">setLngLat</span>({ lng, lat })</span><br><span class="line">  .<span class="title function_">addTo</span>(map);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> popup = <span class="keyword">new</span> mapboxgl.<span class="title class_">Popup</span>().<span class="title function_">setDOMContent</span>(popupContentDom);</span><br><span class="line">marker.<span class="title function_">setPopup</span>(popup);</span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> (</span><br><span class="line">  <span class="language-xml"><span class="tag">&lt;<span class="name">React.Fragment</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;<span class="name">MapGIS</span> <span class="attr">xxx</span> /&gt;</span></span></span><br><span class="line"><span class="language-xml">    {/* 这里是通过props.children的方式接受自定义内容组件 */}</span></span><br><span class="line"><span class="language-xml">    {ReactDOM.createPortal(["自定义组件"], markerComp)}</span></span><br><span class="line"><span class="language-xml">  <span class="tag">&lt;/<span class="name">React.Fragment</span>&gt;</span></span></span><br><span class="line">);</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="弊端"><a href="#弊端" class="headerlink" title="弊端"></a>弊端</h3><blockquote>
+<p>地图组件内容本身要处理例如瓦片， <em><code>图层(layer)</code><em>，</em><code>数据源(source)</code><em>，</em><code>标记点</code><em>、</em><code>线条</code><em>、</em><code>面</code><em>、</em><code>图像</code></em> 等渲染以及原生事件，因此如果当 marker 点位过多的时候会影响地图加载速度。</p>
+</blockquote>
+<h3 id="解决方式"><a href="#解决方式" class="headerlink" title="解决方式"></a>解决方式</h3><p>… 下篇文章 <i class="fa-regular fa-hand-peace" style="color:orange"></i></p>
+]]></content>
+      <categories>
+        <category>React</category>
+      </categories>
+      <tags>
+        <tag>react</tag>
+        <tag>createPortal</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Diff-Algorithm</title>
+    <url>/Diff-Algorithm.html</url>
+    <content><![CDATA[<p><strong><em>Brief Intro</em></strong>: <em>Indicating What’s diff algorithm &amp; how to diff every node after React Components Update. Simple conclusions after reading other talents’ articles</em></p>
+<span id="more"></span>
+
+<h1 id="限制"><a href="#限制" class="headerlink" title="限制"></a>限制</h1><ol>
+<li>只对同级的 DOM 节点进行比较</li>
+<li>如果 DOM 前后元素类型发生改变，则销毁节点及其子节点，并新建变更后的节点及其子节点</li>
+<li>可以通过 key 来保持不同渲染下元素的稳定</li>
+</ol>
+<h1 id="单节点-Diff"><a href="#单节点-Diff" class="headerlink" title="单节点 Diff"></a>单节点 Diff</h1><ul>
+<li>newChild 类型为 object、number、string</li>
+</ul>
+<img src="/Diff-Algorithm/diff.png" class="">
+<p><strong>只有当 key 相同切 type 相同的时候，才能够复用 DOM</strong></p>
+<h1 id="多节点-Diff"><a href="#多节点-Diff" class="headerlink" title="多节点 Diff"></a>多节点 Diff</h1><ul>
+<li>newChild 类型为 Array</li>
+<li> 相较于节点的删除，新增操作，更新操作更加频繁，Diff 会优先执行更新操作</li>
+<li>整体进行两轮遍历：一轮处理更新节点；二轮处理非更新节点</li>
+</ul>
+]]></content>
+      <categories>
+        <category>React</category>
+        <category>Diff</category>
+      </categories>
+      <tags>
+        <tag>algorithm</tag>
+        <tag>diff</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>EventLoop</title>
+    <url>/EventLoop.html</url>
+    <content><![CDATA[<p><strong><em>Brief Intro</em></strong>: <em>JavaScript is a single thread lang, it can only do one thing at one tiem. Because of event loop, js thread isn’t blocked while running into asnychronous events.</em></p>
+<ul>
+<li>Event Loop</li>
+<li>Browser Event</li>
+<li>Node Event</li>
+</ul>
+<span id="more"></span>
+
+<h1 id="事件循环"><a href="#事件循环" class="headerlink" title="事件循环"></a>事件循环</h1><p>js 是单线程，任务分为同步和异步<br>异步情形：读取文件、网络请求等</p>
+<img src="/EventLoop/event.png" class="">
+
+<h2 id="异步任务回调通知"><a href="#异步任务回调通知" class="headerlink" title="异步任务回调通知"></a>异步任务回调通知</h2><ul>
+<li>等待异步任务准备的同时，js 去执行其他同步任务，等待准备好了再去执行功能，也叫<strong>非阻塞式</strong></li>
+<li>实现 “通知” 的则是就是时间循环，它是计算机的一种机制</li>
+<li>事件循环是由一个队列组成，异步任务回到先进先出，跟据队列任务的不同，分为宏任务和微任务</li>
+</ul>
+<img src="/EventLoop/js-string.png" class="">
+
+<h2 id="浏览器事件循环"><a href="#浏览器事件循环" class="headerlink" title="浏览器事件循环"></a>浏览器事件循环</h2><p>由一个宏任务队列 + 多个微任务队列组成</p>
+<ul>
+<li>第一个宏任务：全局 script 脚本。产生的宏任务和微任务进入各自队列中，执行完 script 后，清空当前微任务队列，完成一次事件循环；</li>
+<li>再取出另外一个宏任务，把回调放入队列中，再清空微任务队列</li>
+<li>宏任务队列只有一个，每一个宏任务都有自己的微任务队列，每轮循环都是由一个宏任务 + 多个微任务组成 </li>
+</ul>
+<figure class="highlight javascript"><table><tbody><tr><td class="code"><pre><span class="line"><span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> {</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"第一个回调函数：微任务1"</span>);</span><br><span class="line">  <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> {</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"第三个回调函数：宏任务2"</span>);</span><br><span class="line">  }, <span class="number">0</span>);</span><br><span class="line">});</span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> {</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"第二个回调函数：宏任务1"</span>);</span><br><span class="line">  <span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> {</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"第四个回调函数：微任务2"</span>);</span><br><span class="line">  });</span><br><span class="line">}, <span class="number">0</span>);</span><br><span class="line"><span class="comment">// 第一个回调函数：微任务1</span></span><br><span class="line"><span class="comment">// 第二个回调函数：宏任务1</span></span><br><span class="line"><span class="comment">// 第四个回调函数：微任务2</span></span><br><span class="line"><span class="comment">// 第三个回调函数：宏任务2</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="Node-事件循环"><a href="#Node-事件循环" class="headerlink" title="Node 事件循环"></a>Node 事件循环</h1><p>由 6 个宏任务队列 + 6 个微任务队列组成</p>
+<ul>
+<li>一个宏任务队列全部完成后，清空一次微任务队列，然后到下一个等级的宏任务队列，以此往复</li>
+<li>一个宏任务队列搭配一个微任务队列，六个等级的宏任务全部完成后，才是一轮循环</li>
+<li> node 端宏微任务也有优先级先后：先 process.nextTick，后 promise.then 等 </li>
+</ul>
+<img src="/EventLoop/node-event.png" class="">
+
+<figure class="highlight javascript"><table><tbody><tr><td class="code"><pre><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"Script开始"</span>);</span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> {</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"第一个回调函数，宏任务1"</span>);</span><br><span class="line">  <span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="keyword">function</span> (<span class="params"></span>) {</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"第四个回调函数，微任务2"</span>);</span><br><span class="line">  });</span><br><span class="line">}, <span class="number">0</span>);</span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> {</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"第二个回调函数，宏任务2"</span>);</span><br><span class="line">  <span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="keyword">function</span> (<span class="params"></span>) {</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"第五个回调函数，微任务3"</span>);</span><br><span class="line">  });</span><br><span class="line">}, <span class="number">0</span>);</span><br><span class="line"><span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="keyword">function</span> (<span class="params"></span>) {</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"第三个回调函数，微任务1"</span>);</span><br><span class="line">});</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"Script结束"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// node端：</span></span><br><span class="line"><span class="comment">// Script开始</span></span><br><span class="line"><span class="comment">// Script结束</span></span><br><span class="line"><span class="comment">// 第三个回调函数，微任务1</span></span><br><span class="line"><span class="comment">// 第一个回调函数，宏任务1</span></span><br><span class="line"><span class="comment">// 第二个回调函数，宏任务2</span></span><br><span class="line"><span class="comment">// 第四个回调函数，微任务2</span></span><br><span class="line"><span class="comment">// 第五个回调函数，微任务3</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 浏览器</span></span><br><span class="line"><span class="comment">// Script开始</span></span><br><span class="line"><span class="comment">// Script结束</span></span><br><span class="line"><span class="comment">// 第三个回调函数，微任务1</span></span><br><span class="line"><span class="comment">// 第一个回调函数，宏任务1</span></span><br><span class="line"><span class="comment">// 第四个回调函数，微任务2</span></span><br><span class="line"><span class="comment">// 第二个回调函数，宏任务2</span></span><br><span class="line"><span class="comment">// 第五个回调函数，微任务3</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="node11-x-前后版本差异"><a href="#node11-x-前后版本差异" class="headerlink" title="node11.x 前后版本差异"></a>node11.x 前后版本差异</h2><p>前：取出一整个宏任务队列中全部任务，然后执行一个微任务队列<br>后：和浏览器类似，先执行一个宏任务，然后一个微任务队列。依然保留宏任务队列和微任务队列优先级</p>
+<figure class="highlight javascript"><table><tbody><tr><td class="code"><pre><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"Script开始"</span>);</span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> {</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"宏任务1（setTimeout)"</span>);</span><br><span class="line">  <span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> {</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"微任务promise2"</span>);</span><br><span class="line">  });</span><br><span class="line">}, <span class="number">0</span>);</span><br><span class="line"><span class="title function_">setImmediate</span>(<span class="function">() =&gt;</span> {</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"宏任务2"</span>);</span><br><span class="line">});</span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> {</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"宏任务3（setTimeout)"</span>);</span><br><span class="line">}, <span class="number">0</span>);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"Script结束"</span>);</span><br><span class="line"><span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> {</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"微任务promise1"</span>);</span><br><span class="line">});</span><br><span class="line">process.<span class="title function_">nextTick</span>(<span class="function">() =&gt;</span> {</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"微任务nextTick"</span>);</span><br><span class="line">});</span><br><span class="line"></span><br><span class="line"><span class="comment">// node11.x后</span></span><br><span class="line"><span class="comment">// Script开始</span></span><br><span class="line"><span class="comment">// Script结束</span></span><br><span class="line"><span class="comment">// 微任务nextTick</span></span><br><span class="line"><span class="comment">// 微任务promise1</span></span><br><span class="line"><span class="comment">// 宏任务1（setTimeout）</span></span><br><span class="line"><span class="comment">// 微任务promise2</span></span><br><span class="line"><span class="comment">// 宏任务3（setTimeout）</span></span><br><span class="line"><span class="comment">// 宏任务2（setImmediate）</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// node11.x前</span></span><br><span class="line"><span class="comment">// Script开始</span></span><br><span class="line"><span class="comment">// Script结束</span></span><br><span class="line"><span class="comment">// 微任务nextTick</span></span><br><span class="line"><span class="comment">// 微任务promise1</span></span><br><span class="line"><span class="comment">// 宏任务1（setTimeout）</span></span><br><span class="line"><span class="comment">// 宏任务3（setTimeout）</span></span><br><span class="line"><span class="comment">// 微任务promise2</span></span><br><span class="line"><span class="comment">// 宏任务2（setImmediate）</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="宏任务"><a href="#宏任务" class="headerlink" title="宏任务"></a>宏任务</h1><p>常见宏任务</p>
+<ul>
+<li>script（整体代码）</li>
+<li>setTimout：回调不一定在指定时间后执行，而是把回调放到事件循环队列中等待执行；0ms 默认最小时间为 4ms</li>
+<li>setInterval</li>
+<li>setImmediate (node 独有)：用来把一些需要长时间运行的操作放在一个回调函数里，在浏览器完成后面的其他语句后，就立刻执行这个回调函数，setTimeout 优先级高于 setImmediate，也可以替代 setTimeout (0)</li>
+<li>requestAnimationFrame (浏览器独有)</li>
+<li>IO</li>
+<li>UI render（浏览器独有）</li>
+</ul>
+<h1 id="微任务"><a href="#微任务" class="headerlink" title="微任务"></a>微任务</h1><ul>
+<li>process.nextTick (node 独有)</li>
+<li>Promise.then()</li>
+<li>Object.observe</li>
+<li>MutationObserver</li>
+</ul>
+]]></content>
+      <categories>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>event</tag>
+        <tag>loop</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Fiber-Architecture</title>
+    <url>/Fiber-Architecture.html</url>
+    <content><![CDATA[<p><strong><em>Brief Intro</em></strong>: <em>New Architecture to React solve some remaining problems, it’s working process and every part of stage has completely change in fiber</em></p>
+<span id="more"></span>
+
+<h1 id="Render-阶段"><a href="#Render-阶段" class="headerlink" title="Render 阶段"></a>Render 阶段</h1><ul>
+<li>在内存中执行，工作结束后通知 renderer 进行相应的 DOM 操作；</li>
+<li>开始于 performSyncWorkOnRoot 或 performConcurrentWorkOnRoot</li>
+</ul>
+<figure class="highlight javascript"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">workLoopSync</span>(<span class="params"></span>) {</span><br><span class="line">  <span class="keyword">while</span> (workInProgress !== <span class="literal">null</span>) {</span><br><span class="line">    <span class="title function_">performUnitOfWork</span>(workInProgress);</span><br><span class="line">  }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight javascript"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">workLoopConcurrent</span>(<span class="params"></span>) {</span><br><span class="line">  <span class="keyword">while</span> (workInProgress !== <span class="literal">null</span> &amp;&amp; !shouldYield) {</span><br><span class="line">    <span class="title function_">performUnitOfWork</span>(workInProgress);</span><br><span class="line">  }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li>performUnitOfWork 会创建 Fiber 节点并赋值给 workInProgress，并将 workInProgress 和已创建的 Fiber 连接起来构成 Fiber 树</li>
+</ul>
+<h2 id="PerformUnitOfWork"><a href="#PerformUnitOfWork" class="headerlink" title="PerformUnitOfWork"></a>PerformUnitOfWork</h2><h3 id="递阶段"><a href="#递阶段" class="headerlink" title="递阶段"></a>递阶段</h3><ol>
+<li>从 rootFiber 开始向下深度优先遍历，为每个 Fiber 节点调用 <code>beginWork</code> 方法</li>
+<li> beginWork 跟据传入的 fiber 节点创建<code>子fiber节点</code>，并将两个 fiber 节点连接起来</li>
+<li>遍历到叶子节点的时候，进入” 归 “阶段</li>
+</ol>
+<h3 id="归阶段"><a href="#归阶段" class="headerlink" title="归阶段"></a>归阶段</h3><ol>
+<li>调用 <code>completeWork</code> 处理 fiber 节点</li>
+<li>如果存在兄弟节点，即 fiber.sibling!==null，则开始进入兄弟节点的递阶段，如果不存在，则进入父级 fiber 的归阶段</li>
+<li>一直归到 rootFiber，则完成 render 阶段的工作</li>
+</ol>
+<h2 id="BeginWork（递阶段）"><a href="#BeginWork（递阶段）" class="headerlink" title="BeginWork（递阶段）"></a>BeginWork（递阶段）</h2><p>mount：首次渲染，没有 current，即 current===null。跟据 fiber.tag 不同，创建不同的 fiber 节点<br>update：current !== null，创建新的 fiber 树，如果存在同样的节点，就可以复用，不存在的话就生成新的 fiber 节点，生成结束后把 current 的指针指向 workInporgress 树，之前的指针断开引用，内存回收<br>reconcilerChildren<br>mount：创建新的<code>子fiber节点</code>；<br>update：将当前的组件和上次更新的组件进行对应 fiber 节点比较，<strong>即 Diff 算法</strong>，跟据比较结果生成新的 fiber 节点；<br>effectTag：执行 dom 操作的具体类型保存在 fiber。effectTag 中</p>
+<img src="/Fiber-Architecture/begin-work.png" class="">
+
+<h2 id="CompleteWork（归阶段）"><a href="#CompleteWork（归阶段）" class="headerlink" title="CompleteWork（归阶段）"></a>CompleteWork（归阶段）</h2><h3 id="hostComponent：原生-DOM-对应的-fiber-节点"><a href="#hostComponent：原生-DOM-对应的-fiber-节点" class="headerlink" title="hostComponent：原生 DOM 对应的 fiber 节点"></a>hostComponent：原生 DOM 对应的 fiber 节点</h3><p>mount</p>
+<ol>
+<li>为 fiber 节点生成对应的 DOM 节点</li>
+<li>将子孙的 fiber 节点插入生成的 DOM 节点中</li>
+<li>处理传入的 props</li>
+<li>appendAllChildren<ol>
+<li> 在 commit 阶段一次插入整颗 dom 树</li>
+<li>每次调用 appendAllChildren 时会将已生成的子孙 DOM 节点插入当前生成的 DOM 节点下</li>
+</ol>
+</li>
+</ol>
+<p>update</p>
+<ol>
+<li>处理 props：onClick，onChange 等回调函数注册；style prop；DANGEROUSLY_SET；children prop</li>
+<li> 主要调用 updateHostComponent 方法，在该方法内部，处理完成后的 props 被赋值给 workInProgress.updateQueue</li>
+</ol>
+<h3 id="effectList"><a href="#effectList" class="headerlink" title="effectList"></a>effectList</h3><ol>
+<li>completeWork 的前置函数 completeUnitOfWork 中，每个执行完 completeWork 且存在 effectTag 的 fiber 节点会被保存在 effectList 的单向链表中</li>
+<li>第一个 fiber 节点保存在 fiber.firstEffect，最后一个保存在 fiber.lastEffect 中</li>
+<li> commit 阶段只需要遍历 effectList 即可执行所有的 effect</li>
+<li>performSyncWorkOnRoot 函数中的 fiberRootNode 传递给 commitRoot，开启 commit 阶段</li>
+</ol>
+<img src="/Fiber-Architecture/complete-work.png" class="">
+
+<h1 id="Commit-阶段"><a href="#Commit-阶段" class="headerlink" title="Commit 阶段"></a>Commit 阶段</h1><h2 id="before-mutation（执行-DOM-操作前）"><a href="#before-mutation（执行-DOM-操作前）" class="headerlink" title="before mutation（执行 DOM 操作前）"></a>before mutation（执行 DOM 操作前）</h2><ul>
+<li>遍历 effectList，并调用 commitBeforMutationEffects 函数</li>
+</ul>
+<h3 id="commitBeforeMutationEffects"><a href="#commitBeforeMutationEffects" class="headerlink" title="commitBeforeMutationEffects"></a>commitBeforeMutationEffects</h3><ol>
+<li>处理 DOM 节点渲染 / 删除后的 autoFocus、blur 逻辑</li>
+<li>调用 getSnapshotBeforeUpdate 生命周期钩子</li>
+<li>异步调度 useEffect：防止同步渲染时阻塞浏览器渲染</li>
+</ol>
+<h2 id="mutation（执行-DOM-操作）"><a href="#mutation（执行-DOM-操作）" class="headerlink" title="mutation（执行 DOM 操作）"></a>mutation（执行 DOM 操作）</h2><ul>
+<li>遍历 effectList，执行 commitMutationEffects</li>
+</ul>
+<h3 id="commitMutationEffects"><a href="#commitMutationEffects" class="headerlink" title="commitMutationEffects"></a>commitMutationEffects</h3><ol>
+<li>根据 ContentReset effectTag 重置文字节点</li>
+<li>更新 ref</li>
+<li> 根据 effectTag 分别调用不同函数处理 fiber，其中 effectTag 包括 (Placement | Update | Deletion | Hydrating)</li>
+</ol>
+<h2 id="layout（执行-DOM-操作后）"><a href="#layout（执行-DOM-操作后）" class="headerlink" title="layout（执行 DOM 操作后）"></a>layout（执行 DOM 操作后）</h2><ul>
+<li>遍历 effectList，执行 commitLayoutEffects</li>
+</ul>
+<h3 id="commitLayoutEffects"><a href="#commitLayoutEffects" class="headerlink" title="commitLayoutEffects"></a>commitLayoutEffects</h3><ol>
+<li>commitLayoutEffectOnFiber（调用生命周期钩子和 hook 相关操作）</li>
+<li>commitAttachRef（赋值 ref）</li>
+<li>跟据 effectTag 调用不同的处理函数处理 fiber 并更新 ref</li>
+</ol>
+]]></content>
+      <categories>
+        <category>React</category>
+        <category>Fiber</category>
+        <category>Fiber-Architecture</category>
+      </categories>
+      <tags>
+        <tag>react</tag>
+        <tag>fiber</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Fiber-Concept</title>
+    <url>/Fiber-Concept.html</url>
+    <content><![CDATA[<p><em><strong>Brief Intro</strong></em>：<em>Knowing about what new Fiber concept through this mindmap</em></p>
+<span id="more"></span>
+
+
+<div class="markmap-container" style="height:200px">
+  <svg data="{&quot;t&quot;:&quot;heading&quot;,&quot;d&quot;:1,&quot;p&quot;:{&quot;lines&quot;:[0,1]},&quot;v&quot;:&quot;实现原理&quot;,&quot;c&quot;:[{&quot;t&quot;:&quot;heading&quot;,&quot;d&quot;:2,&quot;p&quot;:{&quot;lines&quot;:[2,3]},&quot;v&quot;:&quot;含义&quot;,&quot;c&quot;:[{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[3,4]},&quot;v&quot;:&quot;React15：stack reconciler、React16：fiber reconciler&quot;},{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[4,5]},&quot;v&quot;:&quot;动态单元，保存每次更新中组建改变的状态，要执行的工作&quot;},{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[5,6]},&quot;v&quot;:&quot;静态数据，保存组件类型和DOM节点信息&quot;}]},{&quot;t&quot;:&quot;heading&quot;,&quot;d&quot;:2,&quot;p&quot;:{&quot;lines&quot;:[7,8]},&quot;v&quot;:&quot;每个Fiber对应一个React Element&quot;},{&quot;t&quot;:&quot;heading&quot;,&quot;d&quot;:2,&quot;p&quot;:{&quot;lines&quot;:[9,10]},&quot;v&quot;:&quot;多个Fiber通过单个属性构成Fiber树&quot;,&quot;c&quot;:[{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[10,11]},&quot;v&quot;:&quot;this.return --&amp;gt; 指向父节点&quot;},{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[11,12]},&quot;v&quot;:&quot;this.child --&amp;gt; 指向子节点&quot;},{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[12,13]},&quot;v&quot;:&quot;this.sibling --&amp;gt; 指向兄弟节点&quot;}]}]}"></svg>
+</div>
+
+
+
+<div class="markmap-container" style="height:400px">
+  <svg data="{&quot;t&quot;:&quot;heading&quot;,&quot;d&quot;:1,&quot;p&quot;:{&quot;lines&quot;:[0,1]},&quot;v&quot;:&quot;工作原理&quot;,&quot;c&quot;:[{&quot;t&quot;:&quot;heading&quot;,&quot;d&quot;:2,&quot;p&quot;:{&quot;lines&quot;:[2,3]},&quot;v&quot;:&quot;双缓存&quot;,&quot;c&quot;:[{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[3,4]},&quot;v&quot;:&quot;在内存中完成创建和更新&quot;},{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[4,5]},&quot;v&quot;:&quot;构建与替换 --&amp;gt; DOM树创建与更新&quot;}]},{&quot;t&quot;:&quot;heading&quot;,&quot;d&quot;:2,&quot;p&quot;:{&quot;lines&quot;:[6,7]},&quot;v&quot;:&quot;current fiber树&quot;},{&quot;t&quot;:&quot;heading&quot;,&quot;d&quot;:2,&quot;p&quot;:{&quot;lines&quot;:[8,9]},&quot;v&quot;:&quot;workInProgress fiber树&quot;,&quot;c&quot;:[{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[9,10]},&quot;v&quot;:&quot;构建完成后交给renderer&quot;},{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[10,11]},&quot;v&quot;:&quot;根节点的current指向workInProgress&quot;},{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[11,12]},&quot;v&quot;:&quot;变成current fiber树&quot;},{&quot;t&quot;:&quot;list_item&quot;,&quot;d&quot;:4,&quot;p&quot;:{&quot;lines&quot;:[12,13]},&quot;v&quot;:&quot;通过current和workInProgress替换完成DOM更新&quot;}]},{&quot;t&quot;:&quot;heading&quot;,&quot;d&quot;:2,&quot;p&quot;:{&quot;lines&quot;:[14,15]},&quot;v&quot;:&quot;mount&quot;},{&quot;t&quot;:&quot;heading&quot;,&quot;d&quot;:2,&quot;p&quot;:{&quot;lines&quot;:[15,16]},&quot;v&quot;:&quot;update&quot;}]}"></svg>
+</div>
+]]></content>
+      <categories>
+        <category>React</category>
+        <category>Fiber</category>
+        <category>Fiber-Concept</category>
+      </categories>
+      <tags>
+        <tag>react</tag>
+        <tag>fiber</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>GC</title>
+    <url>/GC.html</url>
+    <content><![CDATA[<p><strong><em>Brief Intro</em></strong>:</p>
+<ul>
+<li>js 引用数据类型保存在堆内存中，栈内保存的是实际对象的引用，每次造作都是操作对象的引用而不是实际对象</li>
+<li>程序运行需要内存，操作系统必须提供内存</li>
+</ul>
+<span id="more"></span>
+
+<img src="/GC/gc.png" class="">
+
+<h1 id="Strategy-策略"><a href="#Strategy-策略" class="headerlink" title="Strategy 策略"></a>Strategy 策略</h1><h2 id="Mark-Clean-标记清除法"><a href="#Mark-Clean-标记清除法" class="headerlink" title="Mark-Clean 标记清除法"></a>Mark-Clean 标记清除法</h2><p>分为标记和清除两个阶段<br>标记：为所有活动对象做上标记<br>清除：把没有标记的对象销毁</p>
+<h3 id="Process-过程"><a href="#Process-过程" class="headerlink" title="Process 过程"></a>Process 过程</h3><ol>
+<li>垃圾收集器在运行时会给内存中的所有变量都加上一个标记，假设内存中所有对象都是垃圾，全标记为 0</li>
+<li> 然后从各个根对象开始遍历，把不是垃圾的节点改成 1</li>
+<li> 清理所有标记为 0 的垃圾，销毁并回收它们所占用的内存空间</li>
+<li>最后，把所有内存中对象标记修改为 0，等待下一轮垃圾回收</li>
+</ol>
+<h3 id="Advantage-优点"><a href="#Advantage-优点" class="headerlink" title="Advantage 优点"></a>Advantage 优点</h3><p>实现简单，只分为打标记和不打标记两种情况</p>
+<h3 id="Disadvantage-缺点"><a href="#Disadvantage-缺点" class="headerlink" title="Disadvantage 缺点"></a>Disadvantage 缺点</h3><p>内存 碎片化：空间内存块是不连续的，容易出现 <strong>内存碎片</strong></p>
+<img src="/GC/disadvantage.png" class="">
+
+<p>分配时间慢：需要进行一次单项便利找到大于等于 size 的块才能为其分配</p>
+<img src="/GC/assign-time.png" class="">
+
+<p><strong>标记整理（Mark-Compact）算法</strong> 可以有效的解决上面的问题，标记结束后，将活着的对象向内存的一段移动，最后清理边界的内存</p>
+<img src="/GC/mark-clean.png" class="">
+
+<h2 id="Reference-Counting-引用计数法"><a href="#Reference-Counting-引用计数法" class="headerlink" title="Reference-Counting 引用计数法"></a>Reference-Counting 引用计数法</h2><h3 id="Process-过程-1"><a href="#Process-过程-1" class="headerlink" title="Process 过程"></a>Process 过程</h3><ol>
+<li>当声明了一个变量并且将一个引用类型赋值给该变量的时候这个值的引用次数就为 1</li>
+<li> 如果同一个值又被赋给另一个变量，那么引用数加 1</li>
+<li> 如果该变量的值被其他的值覆盖了，则引用次数减 1</li>
+<li> 当这个值的引用次数变为 0 的时候，说明没有变量在使用，这个值没法被访问了，回收空间，垃圾回收器会在运行的时候清理掉引用次数为 0 的值占用的内存</li>
+</ol>
+<h3 id="Advantage-优点-1"><a href="#Advantage-优点-1" class="headerlink" title="Advantage 优点"></a>Advantage 优点</h3><ol>
+<li>比标记清除清晰很多，引用为 0 时就会被回收</li>
+<li>标记清除需要隔一段时间进行一次，并且需要遍历堆里的 活动以及非活动对象来清除</li>
+</ol>
+<h3 id="Disadvantage-缺点-1"><a href="#Disadvantage-缺点-1" class="headerlink" title="Disadvantage 缺点"></a>Disadvantage 缺点</h3><ol>
+<li>需要一个计数器，该计数器需要占很大的位置，并且还不知道引用数量的上线，无法解决循环引用无法回收的问题</li>
+<li>按照上文的引用计数策略，它们的引用数量都是 2，但是，在函数 test 执行完成之后，对象 A 和 B 是要被清理的，但使用引用计数则不会被清理，因为它们的引用数量不会变成 0，假如此函数在程序中被多次调用，那么就会造成大量的内存不会被释放 </li>
+</ol>
+<figure class="highlight javascript"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">test</span>(<span class="params"></span>) {</span><br><span class="line">  <span class="keyword">let</span> A = <span class="keyword">new</span> <span class="title class_">Object</span>();</span><br><span class="line">  <span class="keyword">let</span> B = <span class="keyword">new</span> <span class="title class_">Object</span>();</span><br><span class="line"></span><br><span class="line">  A.<span class="property">b</span> = B;</span><br><span class="line">  B.<span class="property">a</span> = A;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="Major-Collection-分代-新老生代-回收法（V8）"><a href="#Major-Collection-分代-新老生代-回收法（V8）" class="headerlink" title="Major-Collection 分代(新老生代)回收法（V8）"></a>Major-Collection 分代 (新老生代) 回收法（V8）</h2><p>新生代：存活时间较短的对象，简单说就是新产生的对象，容量只支持 1-8M<br>老生代：存活时间较长的对象，简单说就是经历过新生代垃圾回收后存活下来的对象，容量较大</p>
+<img src="/GC/generation-gc.png" class="">
+
+<h3 id="Young-GC-新生代垃圾回收"><a href="#Young-GC-新生代垃圾回收" class="headerlink" title="Young-GC 新生代垃圾回收"></a>Young-GC 新生代垃圾回收</h3><ol>
+<li>新加入的对象会放入到使用区，当使用区快写满时，执行一次垃圾清理操作</li>
+<li>对活动对象进行标记，完成后将适用对象复制到空闲区进行排序，非活动对象占用的空间清理掉。空间互换：使用区–&gt; 空闲区、空闲区–&gt; 使用区</li>
+<li>当一个对象多次复制后依然存活，被认为是生命周期较长的对象，（如果一个对象占用空间超过 25%，会被直接移到老生代空间）随后移到老生代区，进行老生代的垃圾回收策略</li>
+</ol>
+<img src="/GC/new-generation.png" class="">
+
+<h3 id="Old-GC-老生代垃圾回收"><a href="#Old-GC-老生代垃圾回收" class="headerlink" title="Old-GC 老生代垃圾回收"></a>Old-GC 老生代垃圾回收</h3><p>整体采用标记清除法</p>
+<h3 id="Advantage-优点-2"><a href="#Advantage-优点-2" class="headerlink" title="Advantage 优点"></a>Advantage 优点</h3><p>分代式机制把一些新、小、存活时间短的对象作为新生代，采用一小块内存频率较高的快速清理，而一些大、老、存活时间长的对象作为老生代，使其很少接受检查，新老生代的回收机制及频率是不同的，可以说此机制的出现很大程度提高了垃圾回收机制的效率</p>
+]]></content>
+      <categories>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>gc</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hooks</title>
+    <url>/Hooks.html</url>
+    <content><![CDATA[<p><strong><em>Brief Intro</em></strong>: <em>Discuss some React Hooks usage and features</em></p>
+<ul>
+<li>useState</li>
+<li>useEffect</li>
+<li>useLayoutEffect</li>
+<li>useRef</li>
+<li>useMemo</li>
+</ul>
+<span id="more"></span>
+
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><h3 id="React-的渲染主要经历了三个阶段："><a href="#React-的渲染主要经历了三个阶段：" class="headerlink" title="React 的渲染主要经历了三个阶段："></a>React 的渲染主要经历了三个阶段：</h3><ol>
+<li>渲染：创建 react 元素；</li>
+<li>调和：主要进行 react 虚拟 dom 对比；</li>
+<li>提交：更新 dom 元素</li>
+</ol>
+<h3 id="触发渲染的几种情况"><a href="#触发渲染的几种情况" class="headerlink" title="触发渲染的几种情况"></a>触发渲染的几种情况</h3><ol>
+<li>组件收到新状态；</li>
+<li>组件内部状态被更新；</li>
+<li>上下文值发生改变（useConttext 监听变化）</li>
+<li>父组件因为上述原因发生重新渲染</li>
+</ol>
+<h1 id="useState"><a href="#useState" class="headerlink" title="useState"></a>useState</h1><p>[state,setState] = useState(initial)</p>
+<ol>
+<li>返回一个状态值和更新状态的函数，默认值为 useState (xxx) 的入参</li>
+<li>组件内部可以接收多个 useState，setState 为异步方法，不会进行对象合并</li>
+<li>调用更新状态函数的时候，原来的状态会保留在存储器中，新状态并在重新渲染的时候返回，即该函数的调用会触发组件重新渲染</li>
+<li>如果被多次调用，react 底层会进行合并处理，只触发一次重新渲染</li>
+</ol>
+<h1 id="useEffect"><a href="#useEffect" class="headerlink" title="useEffect"></a>useEffect</h1><figure class="highlight javascript"><table><tbody><tr><td class="code"><pre><span class="line"><span class="title function_">useEffect</span>(<span class="function">() =&gt;</span> {</span><br><span class="line">  <span class="comment">//副作用函数</span></span><br><span class="line">  <span class="keyword">return</span> <span class="function">() =&gt;</span> {</span><br><span class="line">    <span class="comment">// 副作用函数的返还函数</span></span><br><span class="line">  };</span><br><span class="line">}, [依赖参数]);</span><br></pre></td></tr></tbody></table></figure>
+
+<ol>
+<li>不写依赖：组件更新就会执行副作用函数；</li>
+<li>依赖参数为 []：组件生命周期进入后只会执行一次，即 didMount；</li>
+<li>存在依赖：当依赖变动的时候，钩子函数内部的副作用函数会重新执行，即 didUpdate；</li>
+<li>return 函数：代表组件销毁的时候执行组件卸载时的相关操作，仅当依赖项为空时；</li>
+</ol>
+<h3 id="执行时机"><a href="#执行时机" class="headerlink" title="执行时机"></a>执行时机</h3><p>useEffect 的执行是在 <code>commit</code> 之后，即在页面已经渲染完成之后再触发</p>
+<h3 id="执行顺序"><a href="#执行顺序" class="headerlink" title="执行顺序"></a>执行顺序</h3><p>父子组件同时存在 useEffect 的时候，子组件的 useEffect 先走</p>
+<ol>
+<li>父组件进入 commit 阶段，发现有 Son 组件需要渲染。</li>
+<li>开始进行 Son 的生命周期，Son 进入 commit 阶段，执行子组件的 useEffect，Son 渲染结束</li>
+<li>父组件进行 commit 阶段，渲染完成，执行 useEffect</li>
+</ol>
+<h3 id="优点与不足"><a href="#优点与不足" class="headerlink" title="优点与不足"></a>优点与不足</h3><ul>
+<li>优点：不会阻塞浏览器渲染更新</li>
+<li>缺点：会造成二次污染，用户体验不佳</li>
+</ul>
+<h1 id="useLayoutEffect"><a href="#useLayoutEffect" class="headerlink" title="useLayoutEffect"></a>useLayoutEffect</h1><p>与 componentDidMount 同步执行，在 <code>commit</code> 阶段之前执行，执行顺序优于 useEffect</p>
+<h3 id="优点与不足-1"><a href="#优点与不足-1" class="headerlink" title="优点与不足"></a>优点与不足</h3><p>优点：</p>
+<ol>
+<li>与 componentDidMount 同步执行，不会造成二次污染</li>
+<li> useLayoutEffect 是在 DOM 更新之后，浏览器绘制之前，这样可以方便修改 DOM，获取 DOM 信息，这样浏览器只会绘制一次，如果修改 DOM 布局放在 useEffect ，那 useEffect 执行是在浏览器绘制视图之后，接下来又改 DOM ，就可能会导致浏览器再次回流和重绘。而且由于两次绘制，视图上可能会造成闪现突兀的效果。</li>
+</ol>
+<p>缺点：可能会阻塞浏览器屏幕的渲染更新</p>
+<h1 id="useRef"><a href="#useRef" class="headerlink" title="useRef"></a>useRef</h1><ol>
+<li>useRef 是一个对象，它拥有一个 current 属性，并且不管函数组件执行多少次，而 useRef 返回的对象永远都是原来那一个</li>
+<li>修改 ref 的值是不会引发组件的重新 render ，而 createRef 每次都会发生变化</li>
+</ol>
+<p><strong>createRef 每次渲染都会返回一个新的引用，而 useRef 每次都会返回相同的引用。</strong></p>
+<h1 id="useMemo"><a href="#useMemo" class="headerlink" title="useMemo"></a>useMemo</h1><p><strong>const cacheSomething = useMemo(create,deps)</strong></p>
+<ol>
+<li>create：第一个参数为一个函数，函数的返回值作为缓存值，如上 demo 中把 Children 对应的 element 对象，缓存起来。</li>
+<li>deps： 第二个参数为一个数组，存放当前 useMemo 的依赖项，在函数组件下一次执行的时候，会对比 deps 依赖项里面的状态，是否有改变，如果有改变重新执行 create ，得到新的缓存值。</li>
+<li>cacheSomething：返回值，执行 create 的返回值。如果 deps 中有依赖项改变，返回的重新执行 create 产生的值，否则取上一次缓存值。</li>
+</ol>
+<hr>
+<p>原有的 hooks 存在闭包问题，因此引入新的 hooks 弥补缺陷 (提议)</p>
+<h1 id="useEvent-封装事件处理函数–useCallback"><a href="#useEvent-封装事件处理函数–useCallback" class="headerlink" title="useEvent(封装事件处理函数–useCallback)"></a>useEvent (封装事件处理函数–useCallback)</h1><p>在组件多次 render 的时候保持一致<br>函数内始终能够获取到最新的 props 和 state</p>
+]]></content>
+      <categories>
+        <category>React</category>
+        <category>Hooks</category>
+      </categories>
+      <tags>
+        <tag>react</tag>
+        <tag>hooks</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Git-Relate</title>
+    <url>/Git-Relate.html</url>
+    <content><![CDATA[<ul>
+<li>branch</li>
+<li>stash</li>
+<li>pull</li>
+<li>cherry-pick</li>
+<li>…<span id="more"></span></li>
+</ul>
+<h1 id="branch"><a href="#branch" class="headerlink" title="branch"></a>branch</h1><p>创建分支</p>
+<blockquote>
+<p>git branch <branch name=""></branch></p>
+</blockquote>
+<p>切换分支</p>
+<blockquote>
+<p>git checkout <branch name=""></branch></p>
+</blockquote>
+<p>创建并切换分支</p>
+<blockquote>
+<p>git checkout -b <branch name=""></branch></p>
+</blockquote>
+<p>删除分支</p>
+<blockquote>
+<p>git branch -d <branch name=""></branch></p>
+</blockquote>
+<p>合并分支</p>
+<blockquote>
+<p>git merge <branch name=""></branch></p>
+</blockquote>
+<p>远程分支合并到当前</p>
+<blockquote>
+<p>git merge <remote name="">/<branch name=""></branch></remote></p>
+</blockquote>
+<h1 id="stash"><a href="#stash" class="headerlink" title="stash"></a>stash</h1><p>保存当前未 commit 的代码</p>
+<blockquote>
+<p>git stash</p>
+</blockquote>
+<p>保存当前未 commit 的代码并添加备注</p>
+<blockquote>
+<p>git stash save “备注的内容”</p>
+</blockquote>
+<p>列出 stash 的所有记录</p>
+<blockquote>
+<p>git stash list</p>
+</blockquote>
+<p>删除 stash 的所有记录</p>
+<blockquote>
+<p>git stash clear</p>
+</blockquote>
+<p>应用最近一次的 stash</p>
+<blockquote>
+<p>git stash apply</p>
+</blockquote>
+<p>应用最近一次的 stash，随后删除该记录</p>
+<blockquote>
+<p>git stash pop</p>
+</blockquote>
+<p>删除最近的一次 stash</p>
+<blockquote>
+<p>git stash drop</p>
+</blockquote>
+<p>应用某条记录（pop，drop 同理）</p>
+<blockquote>
+<p>git stash apply stash@{1}</p>
+</blockquote>
+<h1 id="pull-–rebase"><a href="#pull-–rebase" class="headerlink" title="pull –rebase"></a>pull –rebase</h1><ul>
+<li>必须保持本地目录干净，不能存在 modified，untracked 除外</li>
+<li>存在冲突，使用 <code>git rebase --continue</code> 继续操作</li>
+<li>也可使用 <code>git rebase --abort</code> 放弃 rebase</li>
+</ul>
+<h1 id="reset-–soft"><a href="#reset-–soft" class="headerlink" title="reset –soft"></a>reset –soft</h1><p>恢复最近一次 commit</p>
+<blockquote>
+<p>git reset –soft HEAD^</p>
+</blockquote>
+<ul>
+<li>针对的是未 push 的 commit 记录</li>
+<li>对于已经 push 的 commit，本地和远程分支有差异，强制推送 <code>git push -f</code></li>
+<li>reset –soft 指定 commit 号，会将该 commit 到最近一次 commit 的修改内容全部回复，不止针对该 commit</li>
+</ul>
+<h1 id="cherry-pick"><a href="#cherry-pick" class="headerlink" title="cherry-pick"></a>cherry-pick</h1><p>单个复制</p>
+<blockquote>
+<p>git cherry-pick “commitHash”</p>
+</blockquote>
+<p>多条复制</p>
+<blockquote>
+<p>git cherry-pick commit1 commit2</p>
+</blockquote>
+<p>区间复制</p>
+<blockquote>
+<p>git cherry-pick commit1^..commit2</p>
+</blockquote>
+<ul>
+<li>如果遇到冲突，cheery-pick 中断，先解决代码冲突，重新提交到暂存区</li>
+<li>使用 <code>cherry-pick --continue</code>，继续流程</li>
+<li>使用 <code>git cherry-pick --abort</code>，放弃流程</li>
+<li>使用 <code>git cherry-pick --quit</code>，退出流程，什么都没发生</li>
+</ul>
+<h1 id="revert"><a href="#revert" class="headerlink" title="revert"></a>revert</h1><p>将现有的提交还原，生成一条新的还原纪录<br>普通提交</p>
+<blockquote>
+<p>git revert 21dcd937fe555f58841b17466a99118deb489212</p>
+</blockquote>
+<p>合并提交</p>
+<blockquote>
+<p>git revert -m 1 <commithash></commithash></p>
+</blockquote>
+<h1 id="reflog"><a href="#reflog" class="headerlink" title="reflog"></a>reflog</h1><p>查看历史记录，把错误提交的那次 commitHash 记下，reset 回去</p>
+<h1 id="短命令"><a href="#短命令" class="headerlink" title="短命令"></a>短命令</h1><blockquote>
+<p>git config –global alias.ps push</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>Git</category>
+      </categories>
+      <tags>
+        <tag>git</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Life-Cycle</title>
+    <url>/Life-Cycle.html</url>
+    <content><![CDATA[<p><strong><em>Brief Intro</em></strong>: <em>This article can tell you the difference between react15 and 16 in working cycle</em></p>
+<span id="more"></span>
+
+<h1 id="React15"><a href="#React15" class="headerlink" title="React15"></a>React15</h1><img src="/Life-Cycle/lifecycle15.png" class="">
+
+<h2 id="初始化阶段"><a href="#初始化阶段" class="headerlink" title="初始化阶段"></a>初始化阶段</h2><ul>
+<li>constructor: 常用来初始化 State</li>
+<li>componentWillMount: 通过 render 函数生成虚拟 DOM 之前触发，鸡肋</li>
+<li> render: 通过 Diff 算法，生成新的虚拟 DOM</li>
+<li>componentDidMount: 组件渲染完成之后触发，这里可以操作真实 DOM，也可以进行异步数据请求</li>
+</ul>
+<h2 id="更新阶段"><a href="#更新阶段" class="headerlink" title="更新阶段"></a>更新阶段</h2><ul>
+<li>父组件更新触发的更新</li>
+<li>自身 State 改变触发的更新</li>
+</ul>
+<h2 id="卸载阶段"><a href="#卸载阶段" class="headerlink" title="卸载阶段"></a>卸载阶段</h2><ul>
+<li>执行 componentWillUnmount () 方法</li>
+</ul>
+<h2 id="shouldComponentUpdate"><a href="#shouldComponentUpdate" class="headerlink" title="shouldComponentUpdate"></a>shouldComponentUpdate</h2><ul>
+<li>shouldComponentUpdate：这是 React 组件的钩子函数之一，该函数会在组件重新渲染之前调用，由函数的返回的 bool 值决定是否重新渲染组件。</li>
+<li>React 已经提供了 React.PureComponent，来代替使用 shouldComponentUpdate 比对的方法，仅仅使用对 props 和 state 的 “浅比较” 来决定组件是否需要更新。</li>
+<li>注：大部分情况下，可以使用 React.PureComponent 来代替手写 shouldComponentUpdate，由于只是浅比较，对于数据结构足够复杂（比如对象或数组，修改其中某一个项的值或 push 一个值并不会触发更新），当然这种情况可以通过对 props 和 state 的正确使用来避免，使用 concat 或赋值一个新对象来触发重新渲染。</li>
+</ul>
+<h1 id="React16"><a href="#React16" class="headerlink" title="React16"></a>React16</h1><img src="/Life-Cycle/lifecycle16.png" class="">
+
+<h2 id="初始化阶段对比"><a href="#初始化阶段对比" class="headerlink" title="初始化阶段对比"></a>初始化阶段对比</h2><img src="/Life-Cycle/mount-compare.png" class="">
+
+<ul>
+<li>去掉了 componentWillMount，新增了 getDerivedStateFromProps。</li>
+<li><strong>getDerivedStateFromProps 并不是用来代替 componentWillMount 方法的，它是用来替换 componentWillReceiveProps 的</strong></li>
+<li> getDerivedStateFromProps<ul>
+<li>getDerivedStateFromProps 是一个静态方法，声明的使用使用 static</li>
+<li>getDerivedStateFromProps 接收两个参数，分别是父组件传递过来的 props 和自身的 state</li>
+<li>getDerivedStateFromProps 必须返回一个对象格式的返回值，否则控制台会被警告</li>
+</ul>
+</li>
+</ul>
+<h2 id="更新阶段对比"><a href="#更新阶段对比" class="headerlink" title="更新阶段对比"></a>更新阶段对比</h2><img src="/Life-Cycle/update-compare.png" class="">
+
+<h2 id="卸载阶段-1"><a href="#卸载阶段-1" class="headerlink" title="卸载阶段"></a>卸载阶段</h2><p>同 React15</p>
+<h1 id="Hooks-和生命周期对应关系"><a href="#Hooks-和生命周期对应关系" class="headerlink" title="Hooks 和生命周期对应关系"></a>Hooks 和生命周期对应关系</h1><table>
+<thead>
+<tr>
+<th>constructor</th>
+<th>useState</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>getDerivedStateFromProps</td>
+<td>useState 里面 update 函数</td>
+</tr>
+<tr>
+<td> shouldComponentUpdate</td>
+<td>useMemo</td>
+</tr>
+<tr>
+<td>render</td>
+<td> 函数本身</td>
+</tr>
+<tr>
+<td> componentDidMount</td>
+<td>useEffect</td>
+</tr>
+<tr>
+<td>componentDidUpdate</td>
+<td>useEffect</td>
+</tr>
+<tr>
+<td>componentWillUnmount</td>
+<td>useEffect 里面返回的函数</td>
+</tr>
+<tr>
+<td> componentDidCatch</td>
+<td> 无</td>
+</tr>
+<tr>
+<td> getDerivedStateFromError</td>
+<td> 无</td>
+</tr>
+</tbody></table>
+]]></content>
+      <categories>
+        <category>React</category>
+        <category>React-Life-Cycle</category>
+      </categories>
+      <tags>
+        <tag>react</tag>
+        <tag>life-cycle</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MongoDB-ORM</title>
+    <url>/MongoDB-ORM.html</url>
+    <content><![CDATA[<p><strong><em>Brief Intro</em></strong> ：<em>Telling the differences among nodejs oriented mongodb orm frameworks</em></p>
+<ul>
+<li>Mongoose</li>
+<li>Prisma</li>
+<li>TypeOrm</li>
+<li>Sequelize</li>
+</ul>
+<span id="more"></span>
+
+<h1 id="Mongoose"><a href="#Mongoose" class="headerlink" title="Mongoose"></a>Mongoose</h1><p><a href="https://prisma.yoga/">官网</a><br><a href="https://github.com/prisma/prisma">Github</a></p>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Mongoose 是对 node 环境中 MongoDB 数据库操作的封装，一个对象模型工具，将数据库中的数据转换为 JavaScript 对象以供我们在应用中使用。</p>
+<h2 id="使用事务"><a href="#使用事务" class="headerlink" title="使用事务"></a>使用事务</h2><figure class="highlight javascript"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">register</span> = <span class="keyword">async</span> (<span class="params"></span>) =&gt; {</span><br><span class="line">  <span class="keyword">const</span> session = <span class="keyword">await</span> conn.<span class="title function_">startSession</span>();</span><br><span class="line">  <span class="keyword">try</span> {</span><br><span class="line">    session.<span class="title function_">startTransaction</span>();</span><br><span class="line">    <span class="keyword">const</span> user = <span class="keyword">await</span> <span class="title class_">User</span>.<span class="title function_">create</span>([{ <span class="attr">name</span>: <span class="string">"Van Helsing"</span> }], { session });</span><br><span class="line">    <span class="keyword">await</span> <span class="title class_">ShippingAddress</span>.<span class="title function_">create</span>(</span><br><span class="line">      [{ <span class="attr">address</span>: <span class="string">"Transylvania"</span>, <span class="attr">user_id</span>: user.<span class="property">id</span> }],</span><br><span class="line">      { session }</span><br><span class="line">    );</span><br><span class="line">    <span class="keyword">await</span> session.<span class="title function_">commitTransaction</span>();</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"success"</span>);</span><br><span class="line">  } <span class="keyword">catch</span> (error) {</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"error"</span>);</span><br><span class="line">    <span class="keyword">await</span> session.<span class="title function_">abortTransaction</span>();</span><br><span class="line">  }</span><br><span class="line">  session.<span class="title function_">endSession</span>();</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
+
+<p>更多参考：</p>
+<ul>
+<li><strong><a href="https://mongoosejs.com/docs/transactions.html">Transactions in Mongoose</a></strong></li>
+<li><strong><a href="https://www.ultimateakash.com/blog-details/IiwzQGAKYAo=/How-to-implement-Transactions-in-Mongoose-&amp;-Node.Js-(Express)">How to implement Transactions in Mongoose &amp; Node.Js</a></strong></li>
+</ul>
+<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><ul>
+<li>上手简单，面向 nodejs 和 mongoDB 的第一选择</li>
+<li>可以为文档创建一个模式结构（Schema）</li>
+<li>可以对模型中的对象 / 文档进行验证</li>
+<li>可以通过类型转换转换为对象模型</li>
+<li>可以使用中间件来应用业务逻辑挂钩</li>
+<li>比 node 原生驱动 MongoDB 更容易</li>
+</ul>
+<h1 id="Prisma"><a href="#Prisma" class="headerlink" title="Prisma"></a>Prisma</h1><p><a href="https://prisma.yoga/">官网</a><br><a href="https://github.com/prisma/prisma">Github</a></p>
+<h2 id="简介-1"><a href="#简介-1" class="headerlink" title="简介"></a>简介</h2><p>Prisma 是一个开源的数据库工具链项目，帮助开发人员更快地构建应用程序并减少错误，支持 PostgreSQL、MySQL、MongoDB、SQL Server 和 SQLite。</p>
+<h2 id="使用事务-1"><a href="#使用事务-1" class="headerlink" title="使用事务"></a>使用事务</h2><figure class="highlight javascript"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> session = db.<span class="title function_">getMongo</span>().<span class="title function_">startSession</span>();</span><br><span class="line"></span><br><span class="line"><span class="comment">// start</span></span><br><span class="line">session.<span class="title function_">startTransaction</span>(</span><br><span class="line">    { <span class="string">"readConcern"</span>: { <span class="string">"level"</span>: <span class="string">"snapshot"</span> },</span><br><span class="line">      <span class="string">"writeConcern"</span>: { <span class="string">"w"</span>: <span class="string">"majority"</span> }}</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">// run</span></span><br><span class="line"><span class="keyword">var</span> authors = session.<span class="title function_">getDatabase</span>(<span class="string">'literature'</span>).<span class="title function_">getCollection</span>(<span class="string">'authors'</span>)</span><br><span class="line">authors.<span class="title function_">insertOne</span>( {</span><br><span class="line">    <span class="string">"first_name"</span>: <span class="string">"Virginie"</span>,</span><br><span class="line">    <span class="string">"last_name"</span>: <span class="string">"Despentes"</span>,</span><br><span class="line">    <span class="string">"title"</span>: <span class="string">"Vernon Subutex"</span>)}</span><br><span class="line">)</span><br><span class="line">session.<span class="title function_">commitTransaction</span>()</span><br><span class="line"></span><br><span class="line"><span class="comment">// Abort</span></span><br><span class="line">session.<span class="title function_">abortTransaction</span>()</span><br></pre></td></tr></tbody></table></figure>
+
+<p>官方文档： <strong><a href="https://www.prisma.io/dataguide/mongodb/mongodb-transactions#how-do-you-use-transactions">How-To-Use-Transaction</a></strong></p>
+<h2 id="优点-1"><a href="#优点-1" class="headerlink" title="优点"></a>优点</h2><ul>
+<li>提供干净和类型安全的 API，小体积数据库查询，同时返回普通的 JS 对象，更容易进行数据库查询</li>
+<li>自带 CRUD 封装、提供 VSCode 扩展插件、语法高亮、智能自动补全</li>
+<li>文档详细全面，当前呼声较高，</li>
+<li>支持多个数据库。在 SQL 和 NoSQL 数据库之间移动时，这对开发人员来说是一个巨大的优势，因为只需要更改 Schema 文件。所有其他操作 / 查询保持不变</li>
+<li>对 TS 支持很好，当前主力维护是 ts-toolbelt 的作者 Pierre-Antoine Mills，prisma 会自动生成几乎所有的类型，会自动注入 ts-toolbelt</li>
+<li> 背后是商业公司维护，不存在 typeOrm 断更的情况</li>
+</ul>
+<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><ul>
+<li>和 TypeOrm 一样，对 Mongo 的支持也停留在试验阶段</li>
+<li>不支持多个模型文件。所有模型都需要写入 <code>schema.prisma</code> 文件，这使得文件杂乱无章，难以调试和阅读</li>
+<li>目前没有嵌入式集合支持</li>
+<li>目前不支持 @@id 和自增</li>
+</ul>
+<h1 id="TypeOrm"><a href="#TypeOrm" class="headerlink" title="TypeOrm"></a>TypeOrm</h1><p><a href="https://typeorm.io/">官网</a><br><a href="https://github.com/typeorm/typeorm">Github</a></p>
+<h2 id="简介-2"><a href="#简介-2" class="headerlink" title="简介"></a>简介</h2><p>TypeORM 是一个运行在 NodeJS、Browser、Cordova、PhoneGap、Ionic、React Native、Expo 和 Electron 平台上的一个 ORM 框架，可以与 TypeScript 和 JavaScript 一起使用。它的目标是始终支持最新的 JavaScript 特性并提供额外的特性以帮助你开发任何使用数据库的应用程序</p>
+<h2 id="支持语言"><a href="#支持语言" class="headerlink" title="支持语言"></a>支持语言</h2><p>MySQL、MariaDB、PostgreSQL、SQLite、Microsoft SQL Server、sql.js、Oracle、MongoDB&nbsp;(试验性)、NativeScript,&nbsp;react-native&nbsp; 和 &nbsp;Cordova</p>
+<h2 id="优点-2"><a href="#优点-2" class="headerlink" title="优点"></a>优点</h2><ul>
+<li>同时支持 <a href="https://github.com/typeorm/typeorm/blob/master/docs/active-record-data-mapper.md#what-is-the-active-record-pattern"><strong>ActiceRecord</strong></a> 和 <a href="https://github.com/typeorm/typeorm/blob/master/docs/active-record-data-mapper.md#what-is-the-data-mapper-pattern"><strong>DataMapper</strong></a></li>
+<li> 完美集成到 NestJs 框架</li>
+<li>对 TS 高度支持，简洁以及支持装饰器语法</li>
+<li>参考了其他优秀 ORM 的实现，例如 Hibernate，Doctrine 和 EntityFramework</li>
+</ul>
+<h2 id="缺点-1"><a href="#缺点-1" class="headerlink" title="缺点"></a>缺点</h2><ul>
+<li>对 Mongo 数据库支持度是试验性的，后期支持度怎样具体不知</li>
+<li>近一年多未继续维护，存在一些坑，issue 积压较多</li>
+<li>没有特别完备的 API 文档，说明不清晰，只有教程和示例</li>
+</ul>
+<h1 id="Sequelize"><a href="#Sequelize" class="headerlink" title="Sequelize"></a>Sequelize</h1><p><a href="https://sequelize.org/">官网</a><br><a href="https://github.com/sequelize/sequelize">Github</a></p>
+<h2 id="缺点-2"><a href="#缺点-2" class="headerlink" title="缺点"></a>缺点</h2><ul>
+<li>不支持 Mongo，直接 pass</li>
+</ul>
+<h1 id="几种-ORM-对比"><a href="#几种-ORM-对比" class="headerlink" title="几种 ORM 对比"></a>几种 ORM 对比</h1><ul>
+<li>Prisma 和 TypeOrm：<a href="https://prisma.yoga/concepts/more/comparisons/prisma-and-typeorm">https://prisma.yoga/concepts/more/comparisons/prisma-and-typeorm</a></li>
+<li>Prisma 和 Mongoose：<a href="https://prisma.yoga/concepts/more/comparisons/prisma-and-mongoose">https://prisma.yoga/concepts/more/comparisons/prisma-and-mongoose</a></li>
+<li>Prisma 和 Sequelize：<a href="https://prisma.yoga/concepts/more/comparisons/prisma-and-sequelize">https://prisma.yoga/concepts/more/comparisons/prisma-and-sequelize</a></li>
+</ul>
+<p><strong><em>其他参考</em></strong></p>
+<blockquote>
+<p><a href="https://devpress.csdn.net/mongodb/62f9855ec6770329307feb25.html">从 Mongoose 到 MongoDB 的 PrismaORM 之旅！</a> &gt; <a href="https://zhuanlan.zhihu.com/p/533245292">使用 NestJS 和 Prisma 创建 REST API</a> &gt; <a href="https://www.nestjs.com.cn/recipes/prisma">NestJS 官网配置 Prisma</a> &gt; <a href="https://www.prisma.io/docs/guides/database/using-prisma-with-mongodb">Using Prisma with MongoDB</a> &gt; <a href="https://zhuanlan.zhihu.com/p/568353578">Prisma 搭配使用 MongoDB 官方指南（中文指导版）</a></p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>MongoDB</category>
+      </categories>
+      <tags>
+        <tag>database</tag>
+        <tag>mongodb</tag>
+        <tag>nodejs</tag>
+        <tag>mongoose</tag>
+        <tag>prisma</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Npm</title>
+    <url>/Npm.html</url>
+    <content><![CDATA[<p><strong><em>Brief Intro</em></strong> ：<em>Summarize the process while starting a frontend project and what npm do during after ‘npm start’ and other knowledges related to npm</em></p>
+<span id="more"></span>
+
+<h1 id="Install-Packages-Flow"><a href="#Install-Packages-Flow" class="headerlink" title="Install Packages Flow"></a>Install Packages Flow</h1><div id="flowchart-0" class="flow-chart"></div>
+
+<h1 id="Lock-json-file"><a href="#Lock-json-file" class="headerlink" title="Lock.json file"></a>Lock.json file</h1><p>解决的主要是 npm install 不确定性问题</p>
+<ul>
+<li>存在 lock 文件的时候，npm install 生成的 node_modules 目录结构一定完全相同</li>
+<li>不同在 lock 文件的时候，重新执行一遍 npm install 流程</li>
+</ul>
+<h2 id="dependencies"><a href="#dependencies" class="headerlink" title="dependencies"></a>dependencies</h2><ul>
+<li><code>version</code>：包版本，安装在 node_modules 中的版本</li>
+<li><code>resolved</code>：包具体安装来源</li>
+<li><code>integrity</code>：包 hash 值，验证已安装的包是否被改动过，是否已失效源</li>
+<li><code>requires</code>：对应子依赖的依赖，与子依赖的 package.json 中的 dependencies 依赖项相同</li>
+<li><code>dependencies</code>：结构和外部 dependencies 结构一样，存储安装在子依赖 node_modules 中的依赖包。并不是所有子依赖都有 dependencies 属性，只有子依赖的依赖和当前已安装在根目录 node_modules 中的依赖冲突后才会有<script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/flowchart/1.6.5/flowchart.min.js"></script><textarea id="flowchart-0-code" style="display: none">st=&gt;start: npm install
+e=&gt;end: 生成lock文件
+op1=&gt;operation: 检查config
+op2=&gt;operation: 远程获取包信息
+op3=&gt;operation: 构建依赖树
+op4=&gt;operation: 下载包资源
+op5=&gt;operation: 校验完整性
+op6=&gt;operation: 解压到node_modules
+sub1=&gt;subroutine: 扁平化
+sub2=&gt;subroutine: 添加到缓存
+cond1=&gt;condition: 是否有lock文件
+cond2=&gt;condition: 是否和package.json声明版本不一致
+cond3=&gt;condition: 检查是否有缓存
+
+
+st-&gt;op1-&gt;cond1
+cond1(yes,right)-&gt;cond2
+cond1(no)-&gt;op2
+cond2(yes)-&gt;op2
+cond2(no)-&gt;cond3
+op2-&gt;op3-&gt;cond3
+cond3(yes,right)-&gt;op6
+cond3(no)-&gt;op4-&gt;op5-&gt;op6
+op6-&gt;e</textarea><textarea id="flowchart-0-options" style="display: none">{"scale":1,"line-width":2,"line-length":50,"text-margin":10,"font-size":12}</textarea><script>  var code = document.getElementById("flowchart-0-code").value;  var options = JSON.parse(decodeURIComponent(document.getElementById("flowchart-0-options").value));  var diagram = flowchart.parse(code);  diagram.drawSVG("flowchart-0", options);</script></li>
+</ul>
+]]></content>
+      <categories>
+        <category>Computer Science</category>
+        <category>Npm</category>
+      </categories>
+      <tags>
+        <tag>npm</tag>
+        <tag>structure</tag>
+        <tag>package</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>TS</title>
+    <url>/TS.html</url>
+    <content><![CDATA[<p><em><strong>Brief Intro</strong></em>：<em>Some information about TypeScript</em></p>
+<ul>
+<li>Basic Type</li>
+<li>Literal Type</li>
+<li>Any</li>
+</ul>
+<span id="more"></span>
+
+<h1 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h1><h2 id="基础类型"><a href="#基础类型" class="headerlink" title="基础类型"></a>基础类型</h2><h3 id="原始类型"><a href="#原始类型" class="headerlink" title="原始类型"></a>原始类型</h3><ul>
+<li>number</li>
+<li>string</li>
+<li>boolean</li>
+<li>null</li>
+<li>undefined</li>
+<li>symbol</li>
+</ul>
+<h3 id="对象类型"><a href="#对象类型" class="headerlink" title="对象类型"></a>对象类型</h3><ul>
+<li>object（数组，对象，函数）</li>
+</ul>
+<h2 id="新增类型"><a href="#新增类型" class="headerlink" title="新增类型"></a>新增类型</h2><h3 id="联合类型"><a href="#联合类型" class="headerlink" title="联合类型"></a>联合类型</h3><p>由两个或多个其他类型组成的类型，可以是这些类型中的任意一种</p>
+<blockquote>
+<p>let 变量：类型 1 | 类型 2 | 类型 3 …. = 初始值<br>let arr1 :number | string = 1 // 可以写两个类型</p>
+</blockquote>
+<h3 id="自定义类型-类型别名"><a href="#自定义类型-类型别名" class="headerlink" title="自定义类型(类型别名)"></a>自定义类型 (类型别名)</h3><p>自己定义的类型名过长时，定义一个别名，别名一般是 <strong>首字母大写</strong></p>
+<blockquote>
+<p>type 别名 = 类型<br>type s = string // 定义<br>const str1:s = ‘abc’<br>const str2:string = ‘abc’</p>
+</blockquote>
+<p>给复杂类型起别名</p>
+<blockquote>
+<p>type NewType = string | number<br> let a: NewType = 1<br> let b: NewType = ‘1’</p>
+</blockquote>
+<h3 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h3><ul>
+<li>普通函数：function 函数名 (形参 1： 类型 = 默认值， 形参 2：类型 = 默认值，…): 返回值类型 { }</li>
+<li> 箭头函数：const 函数名（形参 1： 类型 = 默认值， 形参 2：类型 = 默认值，…): 返回值类型 =&gt; { }</li>
+<li> 统一定义类型<blockquote>
+<p>type Fn = (n1:number,n2:number) =&gt; number</p>
+</blockquote>
+</li>
+</ul>
+<blockquote>
+<p>const add3 : Fn = (a,b)=&gt;{return a+b }</p>
+</blockquote>
+<ul>
+<li><p>返回值为 void：const add = (): void =&gt; {}</p>
+</li>
+<li><p>对象类型</p>
+<figure class="highlight javascript"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 创建类型别名</span></span><br><span class="line">type <span class="title class_">Person</span> = {</span><br><span class="line">  <span class="attr">name</span>: string，</span><br><span class="line">  <span class="attr">age</span>: number</span><br><span class="line">  <span class="title function_">sayHi</span>(): <span class="keyword">void</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用类型别名作为对象的类型：</span></span><br><span class="line"><span class="keyword">let</span> <span class="attr">person</span>: <span class="title class_">Person</span> = {</span><br><span class="line">  <span class="attr">name</span>: <span class="string">'小花'</span>,</span><br><span class="line">  <span class="attr">age</span>: <span class="number">18</span></span><br><span class="line">  <span class="title function_">sayHi</span>(<span class="params"></span>) {}</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+</li>
+<li><p>接口类型（interface）</p>
+<figure class="highlight javascript"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 接口的写法-------------</span></span><br><span class="line">interface <span class="title class_">IPerson</span> {</span><br><span class="line">	<span class="attr">name</span>: string,</span><br><span class="line">	<span class="attr">age</span>: number</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> user1：<span class="title class_">IPerson</span> = {</span><br><span class="line">	<span class="attr">name</span>: <span class="string">'a'</span>,</span><br><span class="line">	<span class="attr">age</span>: <span class="number">20</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// type的写法-------------</span></span><br><span class="line">type <span class="title class_">Person</span>  = {</span><br><span class="line">	<span class="attr">name</span>: string,</span><br><span class="line">	<span class="attr">age</span>: number</span><br><span class="line">}</span><br><span class="line"><span class="keyword">const</span> user2：<span class="title class_">Person</span> = {</span><br><span class="line">	<span class="attr">name</span>: <span class="string">'b'</span>,</span><br><span class="line">	<span class="attr">age</span>: <span class="number">20</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></li>
+</ul>
+<h3 id="字面量类型"><a href="#字面量类型" class="headerlink" title="字面量类型"></a>字面量类型</h3><blockquote>
+<p>let str1 = ‘hello TS’ ： str1 是一个变量 (let)，它的值可以是任意字符串，所以类型为:string<br>const str2 = ‘hello TS’：str2 是一个常量 (const)，它的值不能变化只能是 ‘hello TS’，所以，它的类型为:’hello TS’</p>
+</blockquote>
+<h3 id="any"><a href="#any" class="headerlink" title="any"></a>any</h3><blockquote>
+<p>临时使用 any 来 “避免” 书写很长、很复杂的类型</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>JS</category>
+        <category>TS</category>
+      </categories>
+      <tags>
+        <tag>ts</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>SvgToBase64</title>
+    <url>/SvgToBase64.html</url>
+    <content><![CDATA[<p><strong><em>Brief Intro</em></strong>: <em>Difficulties while transforming Svg to base64</em></p>
+<span id="more"></span>
+
+<blockquote>
+<p>接上文，Marker 数量较多的情况下会比较影响地图加载的性能，因此考虑将 Marker 点都转换成 symbol 方式添加</p>
+</blockquote>
+<h1 id="整体思路"><a href="#整体思路" class="headerlink" title="整体思路"></a>整体思路</h1><ul>
+<li>获取到 react 组件的 html</li>
+<li> 通过 html 转换成 canvas，生成图片</li>
+<li> canvas.toDataUrl () 转 base64</li>
+<li>mapboxgl 可直接接受 base64 格式图片</li>
+</ul>
+<img src="/SvgToBase64/antd.jpg" class="">
+
+<h1 id="方式一：采用-html2canvas"><a href="#方式一：采用-html2canvas" class="headerlink" title="方式一：采用 html2canvas"></a>方式一：采用 html2canvas</h1><img src="/SvgToBase64/html2canvas.png" class="">
+
+<p>通过这种方式的确是可以获取到截图，但是 html2canvas 不能解析 svg 及下面的 dom 节点，因为获取到的结果一个白板。因此考虑换种可以支持的方式 canvg</p>
+<h1 id="方式二：采用-canvg"><a href="#方式二：采用-canvg" class="headerlink" title="方式二：采用 canvg"></a>方式二：采用 canvg</h1><img src="/SvgToBase64/canvg.png" class="">
+
+<p>实践得到图标组件到图片 base64 的转换，可以直接赋值给 mapboxgl。</p>
+<hr>
+<p>所有的踩坑到此结束，虽然代码比较简单，但是整个实践和踩坑过程艰难又麻烦，好几次想放弃，幸好最后的结果还是令自己满意。<i class="fa-regular fa-face-laugh-squint" style="color: #3582d4;"></i></p>
+]]></content>
+      <categories>
+        <category>JS</category>
+      </categories>
+      <tags>
+        <tag>canvas</tag>
+        <tag>svg</tag>
+        <tag>base64</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Written-Promise</title>
+    <url>/Written-Promise.html</url>
+    <content><![CDATA[<p><strong><em>Brief Intro</em></strong> ：<em>Easy way to write promise methods</em></p>
+<ul>
+<li>Any</li>
+<li>All</li>
+<li>Race</li>
+<li>Allsettled</li>
+</ul>
+<span id="more"></span>
+
+<h3 id="Any"><a href="#Any" class="headerlink" title="Any"></a>Any</h3><p><strong>只要有一个成功，就返回成功的那个；如果都失败，则返回失败；与 Promise.all () 相反</strong></p>
+<figure class="highlight javascript"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">any</span>(<span class="params">promises</span>){</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Promise</span>(<span class="function">(<span class="params">resolve,reject</span>)=&gt;</span>{</span><br><span class="line">        <span class="keyword">let</span> count = <span class="number">0</span>;</span><br><span class="line">        promises.<span class="title function_">forEach</span>(<span class="function"><span class="params">p</span>=&gt;</span>{</span><br><span class="line">            p.<span class="title function_">then</span>(<span class="function">(<span class="params">res</span>)=&gt;</span>{</span><br><span class="line">                <span class="title function_">resolve</span>(res);</span><br><span class="line">            },<span class="function">(<span class="params">err</span>)=&gt;</span>{</span><br><span class="line">                count++;</span><br><span class="line">                <span class="keyword">if</span>(count === promises.<span class="property">length</span>){</span><br><span class="line">                    <span class="title function_">reject</span>(err);</span><br><span class="line">                }</span><br><span class="line">            }</span><br><span class="line">        })</span><br><span class="line">    })</span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="All"><a href="#All" class="headerlink" title="All"></a>All</h3><p><strong>等待所有的元素执行完成后结束，遇到错误后抛出第一个错误并跳出</strong></p>
+<figure class="highlight javascript"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">all</span>(<span class="params">promises</span>){</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Promise</span>(<span class="function">(<span class="params">resolve,reject</span>)=&gt;</span>{</span><br><span class="line">        <span class="keyword">let</span> count = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">let</span> res = [];</span><br><span class="line">        <span class="keyword">const</span> <span class="title function_">addRes</span> = (<span class="params">index,data</span>)=&gt;{</span><br><span class="line">            res[index] = data;</span><br><span class="line">            <span class="keyword">if</span>(++count === promises.<span class="property">length</span>) <span class="title function_">resolve</span>(res);</span><br><span class="line">        }</span><br><span class="line">        promises.<span class="title function_">forEach</span>(<span class="function">(<span class="params">p,index</span>)=&gt;</span>{</span><br><span class="line">            <span class="keyword">if</span>(p <span class="keyword">instanceof</span> <span class="title class_">Promise</span>){</span><br><span class="line">                p.<span class="title function_">then</span>(<span class="function">(<span class="params">res</span>)=&gt;</span>{</span><br><span class="line">                    <span class="title function_">addRes</span>(index,res)</span><br><span class="line">                },<span class="function">(<span class="params">err</span>)=&gt;</span>{</span><br><span class="line">                    <span class="title function_">reject</span>(err);</span><br><span class="line">                }</span><br><span class="line">            }<span class="keyword">else</span>{</span><br><span class="line">                <span class="title function_">addRes</span>(index,p)</span><br><span class="line">            }</span><br><span class="line">        })</span><br><span class="line">    })</span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="Race"><a href="#Race" class="headerlink" title="Race"></a>Race</h3><p><strong>第一个成功或者失败后返回结果</strong></p>
+<figure class="highlight javascript"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">race</span>(<span class="params">promises</span>){</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Promise</span>(<span class="function">(<span class="params">resolve,reject</span>)=&gt;</span>{</span><br><span class="line">        promises.<span class="title function_">forEach</span>(<span class="function"><span class="params">p</span>=&gt;</span>{</span><br><span class="line">            <span class="keyword">if</span>(p <span class="keyword">instanceof</span> <span class="title class_">Promise</span>){</span><br><span class="line">                p.<span class="title function_">then</span>(<span class="function">(<span class="params">res</span>)=&gt;</span>{</span><br><span class="line">                    <span class="title function_">resolve</span>(res);</span><br><span class="line">                },<span class="function">(<span class="params">err</span>)=&gt;</span>{</span><br><span class="line">                    <span class="title function_">reject</span>(err);</span><br><span class="line">                }</span><br><span class="line">            }<span class="keyword">else</span>{</span><br><span class="line">                <span class="title function_">resolve</span>(p);</span><br><span class="line">            }</span><br><span class="line">        })</span><br><span class="line">    })</span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="AllSettled"><a href="#AllSettled" class="headerlink" title="AllSettled"></a>AllSettled</h3><p><strong>返回执行的所有元素的执行状态和结果</strong></p>
+<figure class="highlight javascript"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">allSettled</span>(<span class="params">promises</span>){</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Promise</span>(<span class="function">(<span class="params">resolve,reject</span>)=&gt;</span>{</span><br><span class="line">        <span class="keyword">let</span> count = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">let</span> res =[];</span><br><span class="line">        <span class="keyword">const</span> <span class="title function_">addRes</span> = (<span class="params">status,index,data</span>) =&gt;{</span><br><span class="line">            res[index] = { status, data };</span><br><span class="line">            <span class="keyword">if</span>(count === promises.<span class="property">length</span>) <span class="title function_">resolve</span>(res);</span><br><span class="line">        }</span><br><span class="line">        promises.<span class="title function_">forEach</span>(<span class="function">(<span class="params">p,index</span>)=&gt;</span>{</span><br><span class="line">            <span class="keyword">if</span>(p <span class="keyword">instanceof</span> <span class="title class_">Promise</span>){</span><br><span class="line">                p.<span class="title function_">then</span>(<span class="function">(<span class="params">res</span>)=&gt;</span>{</span><br><span class="line">                    <span class="title function_">addRes</span>(<span class="string">"fullfilled"</span>,index,res);</span><br><span class="line">                },<span class="function">(<span class="params">err</span>)=&gt;</span>{</span><br><span class="line">                    <span class="title function_">addRes</span>(<span class="string">"rejected"</span>,index,err);</span><br><span class="line">                }</span><br><span class="line">            }<span class="keyword">else</span>{</span><br><span class="line">                <span class="title function_">addRes</span>(index,p);</span><br><span class="line">            }</span><br><span class="line">        })</span><br><span class="line">    })</span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure>
+]]></content>
+      <categories>
+        <category>JS</category>
+        <category>ES6</category>
+      </categories>
+      <tags>
+        <tag>promise</tag>
+        <tag>js</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Relational-Algebra</title>
+    <url>/Relational-Algebra.html</url>
+    <content><![CDATA[<p><strong><em>Brief Intro</em></strong>: <em>How to differentiate between Relatoinal-Algebras on cross join,natural join,inner join and so on</em></p>
+<span id="more"></span>
+
+<p>在学习过程中遇到了几种数据库关系连接方式，备注下，给自己留的印象更深点。</p>
+<img src="/Relational-Algebra/A.png" class="">
+<img src="/Relational-Algebra/B.png" class="">
+
+<h2 id="笛卡尔积（cross-join）"><a href="#笛卡尔积（cross-join）" class="headerlink" title="笛卡尔积（cross join）"></a>笛卡尔积（cross join）</h2><p>是一个数学名词，在计算机数据库中应用时表示对两个关系库进行操作，产生的关系中元组个数为两个关系中元组个数之积。</p>
+<figure class="highlight sql"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> A,B</span><br><span class="line">或者</span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> A <span class="keyword">cross</span> <span class="keyword">join</span> B</span><br><span class="line">或者</span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> A <span class="keyword">join</span> B</span><br></pre></td></tr></tbody></table></figure>
+<img src="/Relational-Algebra/cross-join.png" class="">
+
+<h2 id="自然连接（内连接-natural-join）"><a href="#自然连接（内连接-natural-join）" class="headerlink" title="自然连接（内连接 - natural join）"></a>自然连接（内连接 - natural join）</h2><p>在等值联接 (以公共属性值相等为条件) 的基础上再行投影操作，去掉 S 中的公共属性列，当两个关系没有公共属性时，自然连接就转化成笛卡尔积</p>
+<figure class="highlight sql"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> A <span class="keyword">natural</span> <span class="keyword">join</span> B</span><br></pre></td></tr></tbody></table></figure>]]></content>
+      <categories>
+        <category>Computer Science</category>
+      </categories>
+      <tags>
+        <tag>relational algebra</tag>
+        <tag>SQL</tag>
+      </tags>
+  </entry>
+</search>
